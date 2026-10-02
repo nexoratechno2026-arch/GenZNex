@@ -11,7 +11,9 @@ import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 
-// db is initialized in index.ts; we import it here
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 const db = admin.firestore();
 
 // ---------------------------------------------------------------------------

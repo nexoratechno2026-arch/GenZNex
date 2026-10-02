@@ -10,7 +10,9 @@
     "emulators": "firebase emulators:start",
     "set-role": "tsx scripts/set-role.ts",
     "test:rules": "tsx tests/rules.test.ts",
-    "seed:courses": "tsx scripts/seed-courses.ts"
+    "seed:courses": "tsx scripts/seed-courses.ts",
+    "seed:phase5": "tsx scripts/seed-phase5.ts",
+    "test:phase5": "tsx scripts/test-phase5-e2e.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -312,7 +312,99 @@ async function runRulesTests() {
     );
     console.log("   ✅ PASS: Direct client review write blocked (must use Cloud Function).");
 
-    console.log("\n🎉 ALL 25 SECURITY RULES TESTS PASSED SUCCESSFULLY! 100% COMPLIANT.\n");
+    console.log("\n🧪 Test 26: Student CANNOT write directly to /batch_enrollments (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "batch_enrollments", `batch_bootcamp_1_${studentUid}`), {
+        batchId: "batch_bootcamp_1",
+        userId: studentUid,
+        status: "active",
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to /batch_enrollments blocked.");
+
+    console.log("\n🧪 Test 27: Student CANNOT write directly to /session_attendance (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "session_attendance", `session_1_${studentUid}`), {
+        batchId: "batch_bootcamp_1",
+        sessionId: "session_1",
+        userId: studentUid,
+        verified: true,
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to /session_attendance blocked.");
+
+    console.log("\n🧪 Test 28: Student CANNOT modify /program_batches capacity/enrolledCount (Must be DENIED)");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const systemDb = context.firestore();
+      await setDoc(doc(systemDb, "program_batches", "batch_test_01"), {
+        programId: "prog_ai",
+        name: "Test Batch",
+        capacity: 30,
+        enrolledCount: 10,
+        trainerIds: [trainerUid],
+        status: "open",
+      });
+    });
+    await assertFails(
+      updateDoc(doc(studentDb, "program_batches", "batch_test_01"), {
+        enrolledCount: 11,
+      })
+    );
+    console.log("   ✅ PASS: Direct client update to /program_batches blocked.");
+
+    console.log("\n🧪 Test 29: Student CANNOT update /project_submissions to alter grade (Must be DENIED)");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const systemDb = context.firestore();
+      await setDoc(doc(systemDb, "project_submissions", "sub_proj_01"), {
+        userId: studentUid,
+        projectId: "proj_capstone",
+        batchId: "batch_test_01",
+        status: "submitted",
+        score: 60,
+      });
+    });
+    await assertFails(
+      updateDoc(doc(studentDb, "project_submissions", "sub_proj_01"), {
+        score: 100,
+        status: "approved",
+      })
+    );
+    console.log("   ✅ PASS: Direct client update to /project_submissions blocked.");
+
+    console.log("\n🧪 Test 30: Student CANNOT read /question_bank private answers (Must be DENIED)");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const systemDb = context.firestore();
+      await setDoc(doc(systemDb, "question_bank", "qb_q1"), {
+        prompt: "What is React Server Component?",
+      });
+      await setDoc(doc(systemDb, "question_bank", "qb_q1", "private", "answers"), {
+        correctAnswer: "Server side component",
+      });
+    });
+    await assertFails(
+      getDoc(doc(studentDb, "question_bank", "qb_q1", "private", "answers"))
+    );
+    console.log("   ✅ PASS: Question bank private answers secrecy enforced.");
+
+    console.log("\n🧪 Test 31: Student CANNOT write directly to /showcase (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "showcase", "showcase_fake"), {
+        title: "Malicious Showcase",
+        studentDisplayName: "Rahul",
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to /showcase blocked (CF-only write).");
+
+    console.log("\n🧪 Test 32: Student CANNOT write directly to /training_programs (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "training_programs", "fake_program"), {
+        title: "Fake Program",
+        status: "published",
+      })
+    );
+    console.log("   ✅ PASS: Student write to /training_programs blocked (Admin only).");
+
+    console.log("\n🎉 ALL 32 SECURITY RULES TESTS (PHASES 1-5) PASSED SUCCESSFULLY! 100% COMPLIANT.\n");
   } finally {
     await testEnv.cleanup();
   }
