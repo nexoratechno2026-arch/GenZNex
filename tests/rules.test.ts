@@ -404,7 +404,127 @@ async function runRulesTests() {
     );
     console.log("   ✅ PASS: Student write to /training_programs blocked (Admin only).");
 
-    console.log("\n🎉 ALL 32 SECURITY RULES TESTS (PHASES 1-5) PASSED SUCCESSFULLY! 100% COMPLIANT.\n");
+    console.log("\n🧪 Test 33: Student CANNOT write directly to /xp_ledger (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "xp_ledger", `${studentUid}_fake_1000`), {
+        userId: studentUid,
+        xpAwarded: 10000,
+        eventType: "lesson_completed",
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to /xp_ledger blocked (CF-only write).");
+
+    console.log("\n🧪 Test 34: Student CANNOT write directly to /users/{uid}/gamification/profile (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "users", studentUid, "gamification", "profile"), {
+        totalXp: 99999,
+        currentLevel: 5,
+        levelName: "Legend",
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to gamification profile blocked.");
+
+    console.log("\n🧪 Test 35: Student CANNOT write directly to /leaderboard_snapshots (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "leaderboard_snapshots", "global_alltime"), {
+        rankings: [{ rank: 1, userId: studentUid, xp: 99999 }],
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to /leaderboard_snapshots blocked.");
+
+    console.log("\n🧪 Test 36: Student CANNOT create notifications directly (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "notifications", "fake_notif_01"), {
+        userId: studentUid,
+        title: "Fake Notif",
+        message: "Spam",
+        isRead: false,
+      })
+    );
+    console.log("   ✅ PASS: Direct client creation of /notifications blocked.");
+
+    console.log("\n🧪 Test 37: Student CAN update isRead on own notification (Must SUCCEED)");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const systemDb = context.firestore();
+      await setDoc(doc(systemDb, "notifications", "notif_valid_01"), {
+        userId: studentUid,
+        title: "Real Notif",
+        message: "Welcome",
+        isRead: false,
+      });
+    });
+    await assertSucceeds(
+      updateDoc(doc(studentDb, "notifications", "notif_valid_01"), {
+        isRead: true,
+      })
+    );
+    console.log("   ✅ PASS: Student updated isRead on own notification.");
+
+    console.log("\n🧪 Test 38: Student CANNOT update other fields on notification (Must be DENIED)");
+    await assertFails(
+      updateDoc(doc(studentDb, "notifications", "notif_valid_01"), {
+        title: "Tampered Title",
+      })
+    );
+    console.log("   ✅ PASS: Non-isRead notification modifications blocked.");
+
+    console.log("\n🧪 Test 39: Student CANNOT read forum of unenrolled course (Must be DENIED)");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const systemDb = context.firestore();
+      await setDoc(doc(systemDb, "forum_posts", "post_unenrolled_01"), {
+        scopeType: "course",
+        scopeId: "course_secret_ai",
+        authorId: "trainer_vikram_01",
+        title: "Exclusive doubt",
+        status: "active",
+      });
+    });
+    await assertFails(
+      getDoc(doc(studentDb, "forum_posts", "post_unenrolled_01"))
+    );
+    console.log("   ✅ PASS: Forum reading of unenrolled course blocked.");
+
+    console.log("\n🧪 Test 40: Enrolled student CAN read forum of enrolled course (Must SUCCEED)");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const systemDb = context.firestore();
+      await setDoc(doc(systemDb, "enrollments", `${studentUid}_course_p6_enrolled`), {
+        userId: studentUid,
+        courseId: "course_p6_enrolled",
+        status: "active",
+      });
+      await setDoc(doc(systemDb, "forum_posts", "post_enrolled_01"), {
+        scopeType: "course",
+        scopeId: "course_p6_enrolled",
+        authorId: "trainer_vikram_01",
+        title: "Welcome Doubt",
+        status: "active",
+      });
+    });
+    await assertSucceeds(
+      getDoc(doc(studentDb, "forum_posts", "post_enrolled_01"))
+    );
+    console.log("   ✅ PASS: Enrolled student granted read access to course forum.");
+
+    console.log("\n🧪 Test 41: Student CANNOT write directly to /forum_votes (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "forum_votes", `${studentUid}_post_fake`), {
+        userId: studentUid,
+        targetType: "post",
+        targetId: "fake",
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to /forum_votes blocked (CF-only write).");
+
+    console.log("\n🧪 Test 42: Student CANNOT write directly to /stats_daily (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "stats_daily", "2026-10-02"), {
+        revenueInPaise: 99999999,
+        signups: 10000,
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to /stats_daily blocked (CF-only write).");
+
+    console.log("\n🎉 ALL 42 SECURITY RULES TESTS (PHASES 1-6) PASSED SUCCESSFULLY! 100% COMPLIANT.\n");
   } finally {
     await testEnv.cleanup();
   }

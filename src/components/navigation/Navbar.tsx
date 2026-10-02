@@ -15,7 +15,10 @@ import {
   ExternalLink,
   LayoutDashboard,
   LogOut,
-  User as UserIcon
+  User as UserIcon,
+  Bell,
+  Trophy,
+  MessageSquare,
 } from "lucide-react";
 import type { UserRole } from "@/types/schema";
 import { useAuth } from "@/lib/context/AuthContext";
@@ -77,7 +80,7 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
         </div>
 
         {/* Desktop Nav Items */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+        <nav className="hidden md:flex items-center gap-5 text-sm font-medium">
           <Link 
             href="/#courses" 
             className="text-gray-300 hover:text-white transition-colors"
@@ -85,10 +88,24 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
             Courses
           </Link>
           <Link 
+            href="/forum" 
+            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+            <span>Doubts</span>
+          </Link>
+          <Link 
+            href="/leaderboard" 
+            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+          >
+            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+            <span>Leaderboard</span>
+          </Link>
+          <Link 
             href="/#emulator-status" 
             className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
           >
-            <Layers className="w-4 h-4 text-cyan-400" />
+            <Layers className="w-3.5 h-3.5 text-cyan-400" />
             <span>Architecture &amp; Rules</span>
           </Link>
           <a 
@@ -146,6 +163,15 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
           {/* User Auth Buttons / Profile Menu */}
           {user ? (
             <div className="flex items-center gap-2">
+              <Link 
+                href="/notifications"
+                title="Notifications"
+                className="relative p-2 rounded-lg border border-gray-700/60 bg-[#161928] text-gray-300 hover:text-white hover:border-purple-500/50 transition-colors"
+                id="nav-notifications-btn"
+              >
+                <Bell className="w-4 h-4" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50" />
+              </Link>
               <Link href={dashboardHref}>
                 <Button
                   variant="primary"

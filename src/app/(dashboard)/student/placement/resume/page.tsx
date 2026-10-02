@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
+import { db, functions } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/context/AuthContext";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { httpsCallable } from "firebase/functions";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import type { StudentProfileDoc, ResumeTemplate } from "@/types/schema";
@@ -45,7 +45,6 @@ const SUGGESTED_SKILLS = ["JavaScript", "React", "Node.js", "Python", "SQL", "Fi
 
 export default function ResumeBuilderPage() {
   const { user, userProfile } = useAuth();
-  const functions = getFunctions(undefined, "us-central1");
 
   const [activeTab, setActiveTab] = useState<Tab>("profile");
   const [saving, setSaving] = useState(false);

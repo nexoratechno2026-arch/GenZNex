@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
+import { db, functions } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/context/AuthContext";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { httpsCallable } from "firebase/functions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import type { SessionDoc, BatchEnrollmentDoc } from "@/types/schema";
@@ -33,7 +33,6 @@ export default function StudentSchedulePage() {
   const [loading, setLoading] = useState(true);
   const [joiningSessionId, setJoiningSessionId] = useState<string | null>(null);
   const [joinError, setJoinError] = useState<string>("");
-  const functions = getFunctions(undefined, "us-central1");
 
   useEffect(() => {
     if (!user) return;

@@ -26,6 +26,13 @@ import {
   Rocket,
   Code2,
   Building2,
+  Trophy,
+  Flame,
+  Award,
+  MessageSquare,
+  Bell,
+  BarChart3,
+  Settings,
 } from "lucide-react";
 import type { UserRole } from "@/types/schema";
 import { useAuth } from "@/lib/context/AuthContext";
@@ -41,6 +48,11 @@ export function Sidebar({ role }: SidebarProps) {
   const studentNavItems = [
     { label: "Overview", href: "/student", icon: LayoutDashboard },
     { label: "My Courses", href: "/student/courses", icon: BookOpen },
+    // --- Phase 6: Gamification & Community ---
+    { label: "Achievements & XP", href: "/student/achievements", icon: Flame },
+    { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
+    { label: "Doubt Clearing Forum", href: "/forum", icon: MessageSquare },
+    { label: "Notifications", href: "/notifications", icon: Bell },
     // --- Phase 5: Training Module ---
     { label: "My Training", href: "/student/training", icon: Rocket },
     { label: "Live Schedule", href: "/student/schedule", icon: Calendar },
@@ -56,6 +68,10 @@ export function Sidebar({ role }: SidebarProps) {
   const trainerNavItems = [
     { label: "Overview", href: "/trainer", icon: LayoutDashboard },
     { label: "Course Studio", href: "/trainer/courses", icon: BookOpen },
+    // --- Phase 6: Analytics & Forum ---
+    { label: "Cohort Analytics", href: "/trainer/analytics", icon: BarChart3 },
+    { label: "Doubts & Forum", href: "/forum", icon: MessageSquare },
+    { label: "Notifications", href: "/notifications", icon: Bell },
     // --- Phase 5: Training Module ---
     { label: "My Batches", href: "/trainer/batches", icon: Users },
     { label: "Mark Attendance", href: "/trainer/attendance", icon: CalendarCheck },
@@ -66,12 +82,16 @@ export function Sidebar({ role }: SidebarProps) {
 
   const adminNavItems = [
     { label: "Overview", href: "/admin", icon: LayoutDashboard },
+    // --- Phase 6: Analytics & Community ---
+    { label: "Platform Analytics", href: "/admin/analytics", icon: BarChart3 },
+    { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
+    { label: "Community Forum", href: "/forum", icon: MessageSquare },
+    { label: "Notifications", href: "/notifications", icon: Bell },
+    // --- Phase 5 & Core ---
     { label: "Course Approvals", href: "/admin/courses", icon: Layers },
-    // --- Phase 5: Training Module ---
     { label: "Training Programs", href: "/admin/programs", icon: Rocket },
     { label: "All Batches", href: "/admin/batches", icon: Users },
     { label: "Job Board Admin", href: "/admin/jobs", icon: Building2 },
-    // --- Core ---
     { label: "Payments & Orders", href: "/admin/payments", icon: CreditCard },
     { label: "Coupons", href: "/admin/coupons", icon: Tag },
     { label: "Revenue & Taxes", href: "/admin/revenue", icon: TrendingUp },

@@ -516,36 +516,34 @@ export interface CourseReviewDoc {
   updatedAt: unknown;
 }
 
-// 12. forum_posts: /forum_posts/{postId}
-export interface ForumPostDoc {
-  id: string;
-  courseId: string;
-  authorId: string;
-  authorName: string;
-  authorRole: UserRole;
-  title: string;
-  contentMarkdown: string;
-  tags: string[];
-  upvotesCount: number;
-  repliesCount: number;
-  isPinned: boolean;
-  createdAt: unknown;
-  updatedAt: unknown;
-}
 
-// Subcollection: /forum_posts/{postId}/replies/{replyId}
-export interface ForumReplyDoc {
-  id: string;
-  authorId: string;
-  authorName: string;
-  authorRole: UserRole;
-  contentMarkdown: string;
-  upvotesCount: number;
-  createdAt: unknown;
-}
-
-// 13. notifications: /notifications/{notificationId}
-export type NotificationType = "course" | "batch" | "payment" | "system";
+export type NotificationType =
+  | "course"
+  | "batch"
+  | "payment"
+  | "system"
+  | "training"
+  | "payment_success"
+  | "invoice_generated"
+  | "enrollment_success"
+  | "course_approved"
+  | "course_rejected"
+  | "session_reminder_24h"
+  | "session_reminder_30m"
+  | "session_rescheduled"
+  | "session_cancelled"
+  | "assignment_graded"
+  | "quiz_result"
+  | "certificate_issued"
+  | "waitlist_promoted"
+  | "forum_reply"
+  | "forum_accepted"
+  | "badge_earned"
+  | "level_up"
+  | "streak_at_risk"
+  | "job_application_status"
+  | "job_alert"
+  | "system_broadcast";
 
 export interface NotificationDoc {
   id: string;
@@ -1112,4 +1110,241 @@ export type StudentProfile = StudentProfileDoc;
 export type JobApplication = JobApplicationDoc;
 export type CompanyPartner = CompanyPartnerDoc;
 export type Showcase = ShowcaseDoc;
+
+// ============================================================================
+// PHASE 6: GAMIFICATION, NOTIFICATIONS, FORUM & ANALYTICS
+// ============================================================================
+
+// --- 1. Gamification Engine Types ---
+export type XpEventType =
+  | "lesson_completed"
+  | "quiz_passed"
+  | "quiz_perfect"
+  | "assignment_passed"
+  | "session_attended"
+  | "project_approved"
+  | "course_completed"
+  | "review_posted"
+  | "forum_answer_accepted"
+  | "daily_login";
+
+export type LevelName = "Rookie" | "Explorer" | "Achiever" | "Pro" | "Legend";
+
+export interface XpLedgerDoc {
+  id: string; // `${userId}_${eventType}_${refId}`
+  userId: string;
+  eventType: XpEventType;
+  refId: string;
+  xpAwarded: number;
+  metadata?: Record<string, unknown>;
+  awardedAt: unknown;
+  dateIST: string; // YYYY-MM-DD
+}
+
+export interface UserGamificationDoc {
+  userId: string;
+  totalXp: number;
+  currentLevel: number;
+  levelName: LevelName;
+  xpToNextLevel: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: string; // YYYY-MM-DD
+  streakFreezesRemaining: number; // default 1 per week
+  streakFreezeLastGrantedWeek?: string; // YYYY-WW
+  leaderboardOptOut: boolean;
+  earnedBadgeIds: string[];
+  updatedAt: unknown;
+}
+
+export type BadgeCategory = "learning" | "streak" | "community" | "milestone";
+export type BadgeCriteriaType = "count" | "streak" | "score" | "special";
+
+export interface BadgeDoc {
+  id: string;
+  name: string;
+  description: string;
+  icon: string; // Lucide icon identifier
+  category: BadgeCategory;
+  criteriaType: BadgeCriteriaType;
+  threshold: number;
+  order: number;
+}
+
+export interface UserBadgeAwardDoc {
+  id: string; // `${userId}_${badgeId}`
+  userId: string;
+  badgeId: string;
+  badgeName: string;
+  awardedAt: unknown;
+}
+
+export type LeaderboardScope = "weekly" | "alltime" | "course" | "batch";
+
+export interface LeaderboardRankItem {
+  rank: number;
+  userId: string;
+  displayName: string;
+  photoURL?: string;
+  xp: number;
+  level: number;
+  levelName: string;
+}
+
+export interface LeaderboardSnapshotDoc {
+  id: string; // "global_weekly" | "global_alltime" | `course_${courseId}` | `batch_${batchId}`
+  type: LeaderboardScope;
+  scopeId?: string;
+  rankings: LeaderboardRankItem[];
+  generatedAt: unknown;
+}
+
+export interface GamificationConfigDoc {
+  xpRules: Record<XpEventType, number>;
+  dailyCaps: Partial<Record<XpEventType, number>>;
+  levelFormula: {
+    base: number;
+    multiplier: number;
+  };
+  levels: Array<{ level: number; name: LevelName; minXp: number }>;
+}
+
+// --- 2. Notification Engine Types ---
+export type NotificationChannel = "in_app" | "push" | "email" | "sms";
+
+// NotificationType is defined above in core models
+
+export interface NotificationSettingsDoc {
+  userId: string;
+  channels: {
+    inApp: boolean;
+    push: boolean;
+    email: boolean;
+  };
+  types: Partial<Record<NotificationType, boolean>>;
+  quietHours: {
+    enabled: boolean;
+    startIST: string; // e.g. "22:00"
+    endIST: string;   // e.g. "08:00"
+  };
+  updatedAt: unknown;
+}
+
+export interface NotificationQueueItemDoc {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  channels: NotificationChannel[];
+  data?: Record<string, string>;
+  linkUrl?: string;
+  status: "pending" | "processing" | "sent" | "failed" | "dead_letter";
+  attempts: number;
+  maxAttempts: number;
+  scheduledFor?: unknown;
+  createdAt: unknown;
+  error?: string;
+}
+
+export interface FcmTokenDoc {
+  token: string;
+  userId: string;
+  userAgent?: string;
+  lastUsedAt: unknown;
+  createdAt: unknown;
+}
+
+// --- 3. Discussion Forum & Doubt Clearing Types ---
+export type ForumScopeType = "course" | "batch";
+
+export interface ForumPostDoc {
+  id: string;
+  scopeType: ForumScopeType;
+  scopeId: string; // courseId or batchId
+  lessonId?: string;
+  videoTimestampSeconds?: number;
+  authorId: string;
+  authorName: string;
+  authorRole: UserRole;
+  authorAvatar?: string;
+  title: string;
+  content: string; // markdown
+  tags: string[];
+  imageUrls: string[];
+  replyCount: number;
+  upvoteCount: number;
+  isResolved: boolean;
+  hasAcceptedAnswer: boolean;
+  acceptedReplyId?: string;
+  isPinned: boolean;
+  isLocked: boolean;
+  status: "active" | "hidden" | "deleted";
+  reportCount: number;
+  lastActivityAt: unknown;
+  createdAt: unknown;
+  updatedAt: unknown;
+}
+
+export interface ForumReplyDoc {
+  id: string;
+  postId: string;
+  authorId: string;
+  authorName: string;
+  authorRole: UserRole;
+  authorAvatar?: string;
+  content: string;
+  isAccepted: boolean;
+  isInstructorAnswer: boolean;
+  upvoteCount: number;
+  status: "active" | "hidden" | "deleted";
+  createdAt: unknown;
+  updatedAt: unknown;
+}
+
+export interface ForumVoteDoc {
+  id: string; // `${userId}_${targetType}_${targetId}`
+  userId: string;
+  targetType: "post" | "reply";
+  targetId: string;
+  createdAt: unknown;
+}
+
+export interface ForumReportDoc {
+  id: string;
+  reporterId: string;
+  targetType: "post" | "reply";
+  targetId: string;
+  postId: string;
+  reason: string;
+  status: "pending" | "reviewed" | "dismissed";
+  createdAt: unknown;
+}
+
+// --- 4. Analytics & Event Aggregation Types ---
+export interface DailyStatsDoc {
+  date: string; // YYYY-MM-DD
+  activeUsers: { dau: number };
+  signups: number;
+  revenueInPaise: number;
+  ordersCount: number;
+  lessonsCompleted: number;
+  quizzesAttempted: number;
+  quizzesPassed: number;
+  certificatesIssued: number;
+  forumPostsCreated: number;
+  forumRepliesCreated: number;
+  notificationsSent: number;
+  notificationsFailed: number;
+  updatedAt: unknown;
+}
+
+export interface TrackEventParams {
+  eventName: string;
+  category?: string;
+  label?: string;
+  value?: number;
+  params?: Record<string, unknown>;
+}
+
 

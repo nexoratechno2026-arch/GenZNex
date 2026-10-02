@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
+import { db, functions } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/context/AuthContext";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { httpsCallable } from "firebase/functions";
 import type { JobDocV2, JobApplicationDoc } from "@/types/schema";
 import {
   Briefcase,
@@ -33,7 +33,6 @@ export default function JobBoardPage() {
   const [applyingJobId, setApplyingJobId] = useState<string | null>(null);
   const [applyError, setApplyError] = useState<string>("");
   const [applySuccess, setApplySuccess] = useState<string>("");
-  const functions = getFunctions(undefined, "us-central1");
 
   useEffect(() => {
     let mounted = true;

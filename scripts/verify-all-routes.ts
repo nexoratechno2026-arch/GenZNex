@@ -49,6 +49,15 @@ const routesToTest: RouteCheck[] = [
   { path: "/trainer/batches", name: "Trainer Cohort Batches Desk", phase: "Phase 5" },
   { path: "/jobs", name: "Placement Job Board", phase: "Phase 5" },
   { path: "/admin", name: "Admin Master Control Panel", phase: "Phase 5" },
+
+  // Phase 6: Gamification, Notifications, Forum, Analytics
+  { path: "/student/achievements", name: "Student Achievements, XP & Badges", phase: "Phase 6" },
+  { path: "/leaderboard", name: "Global & Weekly Leaderboard Podium", phase: "Phase 6" },
+  { path: "/forum", name: "Community Doubt Clearing Forum", phase: "Phase 6" },
+  { path: "/notifications", name: "Notification Center", phase: "Phase 6" },
+  { path: "/settings/notifications", name: "Notification Preferences & Quiet Hours", phase: "Phase 6" },
+  { path: "/admin/analytics", name: "Admin Master KPI & Revenue Analytics", phase: "Phase 6" },
+  { path: "/trainer/analytics", name: "Trainer Cohort Drop-off Analytics", phase: "Phase 6" },
 ];
 
 async function verifyAllRoutes() {

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/lib/context/AuthContext";
+import { CookieConsentBanner } from "@/components/analytics/CookieConsentBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,7 +50,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#090a0f] text-gray-100 selection:bg-purple-500/30 selection:text-purple-200">
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+            <CookieConsentBanner />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -51,7 +51,38 @@ export {
 } from "./training";
 
 
-// Initialize Firebase Admin once
+// Phase 6: Gamification, Notifications, Forum & Analytics
+export {
+  setLeaderboardOptOut,
+  adminAdjustXp,
+  getLeaderboard,
+  streakDailyMaintenance,
+  buildLeaderboardSnapshots,
+} from "./gamification";
+
+export {
+  updateNotificationSettings,
+  saveFcmToken,
+  markNotificationRead,
+  markAllNotificationsRead,
+  adminBroadcastNotification,
+  cleanupOldNotifications,
+} from "./notifications";
+
+export {
+  createForumPost,
+  createForumReply,
+  toggleForumVote,
+  acceptForumAnswer,
+  reportForumContent,
+  moderateForumContent,
+} from "./forum";
+
+export {
+  aggregateDailyStats,
+  backfillDailyStats,
+  getAnalyticsSummary,
+} from "./analytics";
 if (admin.apps.length === 0) {
   admin.initializeApp({
     storageBucket: "demo-genznex.appspot.com",
