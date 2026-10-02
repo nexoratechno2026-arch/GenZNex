@@ -1,0 +1,415 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Helper functions for Authentication & RBAC ---
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && request.auth.token.role == role;
+    }
+
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
+    function isTrainer() {
+      return hasRole('trainer');
+    }
+
+    function isStudent() {
+      return hasRole('student');
+    }
+
+    function isPlacementOfficer() {
+      return isAuthenticated() && request.auth.token.role == 'placement';
+    }
+
+    function isAdminOrPlacement() {
+      return isAdmin() || isPlacementOfficer();
+    }
+
+    function isCourseOwner(data) {
+      return ('instructor' in data && data.instructor.uid == request.auth.uid)
+        || ('trainerId' in data && data.trainerId == request.auth.uid);
+    }
+
+    function isCoursePublished(data) {
+      return ('status' in data && data.status == 'published') || ('isPublished' in data && data.isPublished == true);
+    }
+
+    function isEnrolled(courseId) {
+      return isAuthenticated() && exists(/databases/$(database)/documents/enrollments/$(request.auth.uid + '_' + courseId))
+        && get(/databases/$(database)/documents/enrollments/$(request.auth.uid + '_' + courseId)).data.status == 'active';
+    }
+
+    function isEnrolledInBatch(batchId) {
+      return isAuthenticated()
+        && exists(/databases/$(database)/documents/batch_enrollments/$(batchId + '_' + request.auth.uid))
+        && get(/databases/$(database)/documents/batch_enrollments/$(batchId + '_' + request.auth.uid)).data.status == 'active';
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isUser(userId) && (!request.resource.data.keys().hasAny(['role']));
+      allow update: if (isUser(userId) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'createdAt']))) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 2. Courses Collection & Subcollections
+    match /courses/{courseId} {
+      allow read: if isCoursePublished(resource.data)
+        || isAdmin()
+        || (isTrainer() && isCourseOwner(resource.data));
+
+      allow create: if (isTrainer() && isCourseOwner(request.resource.data))
+        || isAdmin();
+
+      allow update: if (isTrainer() && isCourseOwner(resource.data)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'rejectionReason', 'publishedAt', 'rating', 'ratingCount', 'enrollmentCount'])))
+        || isAdmin();
+
+      allow delete: if isAdmin() || (isTrainer() && isCourseOwner(resource.data));
+
+      match /modules/{moduleId} {
+        allow read: if isCoursePublished(get(/databases/$(database)/documents/courses/$(courseId)).data)
+          || isAdmin()
+          || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+
+        allow write: if isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+
+        match /lessons/{lessonId} {
+          allow read: if resource.data.isPreview == true
+            || isEnrolled(courseId)
+            || isAdmin()
+            || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+
+          allow write: if isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+        }
+      }
+
+      match /quizzes/{quizId} {
+        allow read: if isAuthenticated() && (isEnrolled(courseId) || isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data)));
+        allow write: if isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+
+        match /private/answers {
+          allow read, write: if false; // CRITICAL: server-only
+        }
+      }
+
+      match /reviews/{reviewId} {
+        allow read: if resource.data.isHidden != true || isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+        allow write: if false; // Only submitCourseReview Cloud Function writes
+      }
+    }
+
+    // Categories
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Audit Logs
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // 3. Enrollments (No direct client write)
+    match /enrollments/{enrollmentId} {
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid)
+        || (isTrainer() && resource.data.trainerId == request.auth.uid);
+      allow write: if false;
+
+      match /lesson_progress/{lessonId} {
+        allow read: if isAdmin()
+          || (isAuthenticated() && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid)
+          || isTrainer();
+        allow create, update: if isAuthenticated() && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid;
+        allow delete: if isAdmin();
+      }
+
+      match /notes/{noteId} {
+        allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid;
+      }
+
+      match /bookmarks/{lessonId} {
+        allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid;
+      }
+    }
+
+    // 4. Progress
+    match /progress/{progressId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid) || isTrainer();
+      allow create, update: if isUser(request.resource.data.userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 5. Quizzes
+    match /quizzes/{quizId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isTrainer() || isAdmin();
+
+      match /private/answers {
+        allow read, write: if false; // CRITICAL: server-only
+      }
+    }
+
+    // Quiz Attempts
+    match /quiz_attempts/{attemptId} {
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid)
+        || isTrainer();
+      allow write: if false;
+    }
+
+    // 6. Submissions
+    match /submissions/{submissionId} {
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.studentId == request.auth.uid)
+        || isTrainer();
+      allow create: if isAuthenticated() && request.resource.data.studentId == request.auth.uid;
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // 7. Batches (Phase 4 legacy)
+    match /batches/{batchId} {
+      allow read: if isAuthenticated();
+      allow create: if (isTrainer() && request.resource.data.trainerId == request.auth.uid) || isAdmin();
+      allow update: if (isTrainer() && resource.data.trainerId == request.auth.uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 8. Attendance (Phase 4 legacy)
+    match /attendance/{attendanceId} {
+      allow read: if isAuthenticated();
+      allow create, update: if (isTrainer() && request.resource.data.recordedByTrainerId == request.auth.uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 9. Payments (No direct client write)
+    match /payments/{paymentId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow write: if false;
+    }
+
+    match /invoices/{invoiceId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow write: if false;
+    }
+
+    match /refunds/{refundId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.requestedBy == request.auth.uid);
+      allow write: if false;
+    }
+
+    match /webhookEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    // Config
+    match /config/{configId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Coupons
+    match /coupons/{couponId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // 11. Certificates
+    match /certificates/{certificateId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 12. Forum Posts
+    match /forum_posts/{postId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.authorId == request.auth.uid;
+      allow update: if (isAuthenticated() && resource.data.authorId == request.auth.uid) || isTrainer() || isAdmin();
+      allow delete: if (isAuthenticated() && resource.data.authorId == request.auth.uid) || isAdmin();
+
+      match /replies/{replyId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && request.resource.data.authorId == request.auth.uid;
+        allow update, delete: if (isAuthenticated() && resource.data.authorId == request.auth.uid) || isAdmin();
+      }
+    }
+
+    // 13. Notifications
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
+      allow create, delete: if isAdmin();
+    }
+
+    // 14. Jobs
+    match /jobs/{jobId} {
+      allow read: if true;
+      allow create, update, delete: if isAdminOrPlacement() || isTrainer();
+    }
+
+    // ==========================================================================
+    // PHASE 5 RULES
+    // ==========================================================================
+
+    // P5-1. Training Programs
+    match /training_programs/{programId} {
+      allow read: if resource.data.status == 'published' || isAdmin() || isTrainer();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // P5-2. Program Batches
+    // CRITICAL: enrolledCount and waitlistStudentIds are CF-only fields
+    match /program_batches/{batchId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isAdmin()
+        || (isTrainer() && request.auth.uid in resource.data.trainerIds
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['enrolledCount', 'waitlistStudentIds', 'status']));
+      allow delete: if isAdmin();
+    }
+
+    // P5-3. Batch Enrollments (CF-only write)
+    match /batch_enrollments/{enrollmentId} {
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid)
+        || (isTrainer() && resource.data.batchId != null
+          && request.auth.uid in get(/databases/$(database)/documents/program_batches/$(resource.data.batchId)).data.trainerIds);
+      allow write: if false; // Cloud Functions only
+    }
+
+    // P5-4. Sessions
+    // NOTE: The joinLink field must NEVER be read directly by clients.
+    // Security Rules cannot strip individual fields, so getSessionJoinLink CF
+    // is the enforcement point for the 15-min-before time window.
+    match /sessions/{sessionId} {
+      allow read: if isAuthenticated()
+        && (isAdmin() || isTrainer() || isEnrolledInBatch(resource.data.batchId));
+      allow create, update: if isAdmin()
+        || (isTrainer() && request.auth.uid in get(/databases/$(database)/documents/program_batches/$(request.resource.data.batchId)).data.trainerIds);
+      allow delete: if isAdmin();
+    }
+
+    // P5-5. Session Attendance (one doc per session×student, CF-only write)
+    match /session_attendance/{attendanceId} {
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid)
+        || (isTrainer() && request.auth.uid in get(/databases/$(database)/documents/program_batches/$(resource.data.batchId)).data.trainerIds);
+      allow write: if false; // Cloud Functions only — students cannot mark own attendance
+    }
+
+    // P5-6. Projects
+    match /projects/{projectId} {
+      allow read: if isAuthenticated()
+        && (isAdmin() || isTrainer()
+          || (resource.data.batchId != null && isEnrolledInBatch(resource.data.batchId)));
+      allow create, update: if isAdmin()
+        || (isTrainer() && resource.data.batchId != null
+          && request.auth.uid in get(/databases/$(database)/documents/program_batches/$(resource.data.batchId)).data.trainerIds);
+      allow delete: if isAdmin();
+    }
+
+    // P5-7. Project Submissions
+    match /project_submissions/{submissionId} {
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid)
+        || (isTrainer() && resource.data.batchId != null
+          && request.auth.uid in get(/databases/$(database)/documents/program_batches/$(resource.data.batchId)).data.trainerIds);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if false; // Only Cloud Functions grade/approve submissions
+      allow delete: if isAdmin();
+    }
+
+    // P5-8. Project Teams
+    match /project_teams/{teamId} {
+      allow read: if isAuthenticated()
+        && (isAdmin() || isTrainer()
+          || request.auth.uid in resource.data.memberIds
+          || resource.data.leadUserId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.leadUserId == request.auth.uid;
+      allow update: if isAuthenticated()
+        && (resource.data.leadUserId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // P5-9. Aptitude Tests & Question Bank
+    match /aptitude_tests/{testId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isTrainer();
+    }
+
+    match /question_bank/{questionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isTrainer();
+
+      match /private/answers {
+        allow read, write: if false; // CRITICAL: server-only
+      }
+    }
+
+    // P5-10. Mock Interviews
+    match /mock_interviews/{interviewId} {
+      allow read: if isAdmin()
+        || (isAuthenticated() && resource.data.studentId == request.auth.uid)
+        || (isAuthenticated() && resource.data.interviewerId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.studentId == request.auth.uid;
+      allow update: if false; // CFs handle scheduling, cancellation, feedback
+      allow delete: if isAdmin();
+    }
+
+    // P5-11. Interviewer Availability
+    match /interviewer_availability/{availabilityId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin()
+        || (isTrainer() && resource.data.interviewerId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // P5-12. Student Profiles
+    match /student_profiles/{userId} {
+      allow read: if isAdmin()
+        || isUser(userId)
+        || isTrainer()
+        || (isPlacementOfficer() && resource.data.isProfileVisible == true);
+      allow create, update: if isUser(userId);
+      allow delete: if isAdmin();
+    }
+
+    // P5-13. Job Applications (student-private)
+    match /job_applications/{applicationId} {
+      allow read: if isAdmin()
+        || isPlacementOfficer()
+        || (isAuthenticated() && resource.data.studentId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.studentId == request.auth.uid;
+      allow update: if false; // Status updates are CF-only
+      allow delete: if isAdmin();
+    }
+
+    // P5-14. Company Partners
+    match /company_partners/{partnerId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdminOrPlacement();
+    }
+
+    // P5-15. Public Showcase (consent-gated, public read, CF-only write)
+    match /showcase/{submissionId} {
+      allow read: if true; // Public — student displayName only, no PII
+      allow write: if false; // Only optInToShowcase CF writes after approval + consent
+    }
+  }
+}

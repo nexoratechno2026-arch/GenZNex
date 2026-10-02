@@ -1,0 +1,62 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && request.auth.token.role == role;
+    }
+
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
+    function isTrainer() {
+      return hasRole('trainer');
+    }
+
+    // User profile avatars
+    match /avatars/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if isUser(userId) && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // Course thumbnails and marketing banners (images only)
+    match /courses/{courseId}/thumbnails/{fileName} {
+      allow read: if true;
+      allow write: if (isTrainer() || isAdmin()) && request.resource.size < 10 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // Course assignment submissions / student project files
+    match /submissions/{courseId}/{userId}/{fileName} {
+      allow read: if isUser(userId) || isTrainer() || isAdmin();
+      allow write: if isUser(userId) && request.resource.size < 25 * 1024 * 1024;
+    }
+
+    // Course lesson PDF materials
+    match /courses/{courseId}/lessons/{lessonId}/{fileName} {
+      allow read: if true;
+      allow write: if (isTrainer() || isAdmin()) && request.resource.size < 25 * 1024 * 1024
+                   && request.resource.contentType == 'application/pdf';
+    }
+
+    // Generated Certificate PDFs (Public read, Cloud Functions write only)
+    match /certificates/{fileName} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Note: Course videos are strictly delivered via video provider signed URLs (Mux/Bunny/Vimeo),
+    // and raw video files are not exposed or served directly through open Storage links.
+  }
+}
