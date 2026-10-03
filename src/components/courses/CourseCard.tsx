@@ -90,7 +90,7 @@ export function CourseCard({ course }: CourseCardProps) {
         <div className="mt-4 flex items-center gap-4 text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700 pt-3 border-t border-neutral-800 dark:border-neutral-800 light:border-neutral-200">
           <div className="flex items-center gap-1">
             <GoogleIcon name="schedule" size={15} />
-            <span>{course.estimatedHours || 0} hrs</span>
+            <span>{Math.round((course.totalDurationMinutes || 0) / 60)} hrs</span>
           </div>
           <div className="flex items-center gap-1">
             <GoogleIcon name="menu_book" size={15} />

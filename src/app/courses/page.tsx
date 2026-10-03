@@ -108,16 +108,16 @@ function CourseCatalogContent() {
     async function fetchCatalog() {
       try {
         const results = await searchCourses({
-          queryText: queryText.trim() || undefined,
+          query: queryText.trim() || undefined,
           category: selectedCategory !== "all" ? selectedCategory : undefined,
           level: selectedLevel !== "all" ? selectedLevel : undefined,
           price: selectedPrice !== "all" ? selectedPrice : undefined,
           language: selectedLanguage !== "all" ? selectedLanguage : undefined,
-          sortBy: selectedSort,
+          sort: selectedSort,
         });
 
         if (isMounted) {
-          setCourses(results);
+          setCourses(results.courses);
         }
       } catch (err) {
         console.error("Error fetching courses:", err);
