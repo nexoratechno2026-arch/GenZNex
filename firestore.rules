@@ -118,8 +118,8 @@ service cloud.firestore {
       }
 
       match /quizzes/{quizId} {
-        allow read: if true;
-        allow write: if isAdmin() || (isTrainer() && exists(/databases/$(database)/documents/courses/$(courseId)) && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+        allow read: if isAuthenticated() && (isEnrolled(courseId) || isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data)));
+        allow write: if isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
 
         match /private/answers {
           allow read, write: if false; // CRITICAL: server-only
@@ -127,20 +127,14 @@ service cloud.firestore {
       }
 
       match /assignments/{assignmentId} {
-        allow read: if true;
-        allow write: if isAdmin() || (isTrainer() && exists(/databases/$(database)/documents/courses/$(courseId)) && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+        allow read: if isAuthenticated() && (isEnrolled(courseId) || isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data)));
+        allow write: if isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
       }
 
       match /reviews/{reviewId} {
         allow read: if resource.data.isHidden != true || isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
         allow write: if false; // Only submitCourseReview Cloud Function writes
       }
-    }
-
-    // Assignments (top-level)
-    match /assignments/{assignmentId} {
-      allow read: if true;
-      allow write: if isAdmin() || isTrainer();
     }
 
     // Categories
