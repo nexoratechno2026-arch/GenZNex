@@ -31,24 +31,23 @@ export function Sidebar({ role }: SidebarProps) {
 
   const trainerNavItems = [
     { label: "Trainer Studio", href: "/trainer", icon: "dashboard" },
+    { label: "My Courses", href: "/trainer/courses", icon: "school" },
     { label: "Course Wizard", href: "/trainer/courses/new", icon: "add_circle" },
-    { label: "Assignment Grading", href: "/trainer/grading", icon: "assignment" },
+    { label: "Assignment Grading", href: "/trainer/submissions", icon: "assignment" },
     { label: "Cohort Batches", href: "/trainer/batches", icon: "groups" },
-    { label: "Live Sessions", href: "/trainer/sessions", icon: "video_camera_front" },
-    { label: "Student Projects", href: "/trainer/projects", icon: "folder" },
+    { label: "Trainer Analytics", href: "/trainer/analytics", icon: "analytics" },
     { label: "Doubts Forum", href: "/forum", icon: "forum" },
   ];
 
   const adminNavItems = [
     { label: "Executive Dashboard", href: "/admin", icon: "dashboard" },
-    { label: "Course Approvals", href: "/admin/approvals", icon: "verified" },
-    { label: "Cohort Batches", href: "/admin/training", icon: "groups" },
+    { label: "Course Approvals", href: "/admin/courses", icon: "verified" },
+    { label: "Payments & Refunds", href: "/admin/payments", icon: "receipt_long" },
     { label: "Revenue & Ledger", href: "/admin/revenue", icon: "payments" },
     { label: "Discount Coupons", href: "/admin/coupons", icon: "sell" },
-    { label: "Placement Pipeline", href: "/admin/placement", icon: "work" },
     { label: "Platform Analytics", href: "/admin/analytics", icon: "analytics" },
-    { label: "Feature Flags", href: "/admin/features", icon: "toggle_on" },
-    { label: "System Health", href: "/admin/health", icon: "monitor_heart" },
+    { label: "Training Programs", href: "/programs", icon: "rocket_launch" },
+    { label: "Placement Pipeline", href: "/jobs", icon: "work" },
   ];
 
   const navItems =
