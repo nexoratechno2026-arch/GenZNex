@@ -17,11 +17,17 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return hasRole('admin');
+      return isAuthenticated() && (
+        request.auth.token.get('role', '') == 'admin'
+        || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'admin')
+      );
     }
 
     function isTrainer() {
-      return hasRole('trainer');
+      return isAuthenticated() && (
+        request.auth.token.get('role', '') == 'trainer'
+        || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'trainer')
+      );
     }
 
     function isStudent() {

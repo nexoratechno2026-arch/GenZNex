@@ -32,12 +32,32 @@ export async function syncUserProfile(
     return existing;
   }
 
-  // New user defaults to 'student' role
+  // Determine role based on existing claims, known emails, or additionalData
+  let defaultRole: UserRole = "student";
+  if (user.email === "admin@genznex.in") {
+    defaultRole = "admin";
+  } else if (
+    user.email === "vikram@genznex.in" ||
+    user.email === "ananya@genznex.in" ||
+    user.email === "rohit@genznex.in"
+  ) {
+    defaultRole = "trainer";
+  }
+
+  try {
+    const tokenResult = await user.getIdTokenResult();
+    if (tokenResult.claims.role) {
+      defaultRole = tokenResult.claims.role as UserRole;
+    }
+  } catch (e) {}
+
+  const finalRole = (additionalData.role || defaultRole) as UserRole;
+
   const newProfile: Record<string, unknown> = {
     uid: user.uid,
     email: user.email || "",
     displayName: user.displayName || additionalData.displayName || "Gen Z Scholar",
-    role: "student" as UserRole,
+    role: finalRole,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };

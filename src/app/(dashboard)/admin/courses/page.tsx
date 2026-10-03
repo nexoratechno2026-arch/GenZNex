@@ -78,13 +78,17 @@ export default function AdminCoursesPage() {
       setCategories(catList);
 
       // 3. Fetch audit logs
-      const auditCol = collection(db, "audit_logs");
-      const auditSnap = await getDocs(query(auditCol, orderBy("timestamp", "desc"), limit(20)));
-      const aList: AuditLogDoc[] = [];
-      auditSnap.forEach((snap) => {
-        aList.push({ id: snap.id, ...(snap.data() as Omit<AuditLogDoc, "id">) });
-      });
-      setAuditLogs(aList);
+      try {
+        const auditCol = collection(db, "audit_logs");
+        const auditSnap = await getDocs(query(auditCol, orderBy("timestamp", "desc"), limit(20)));
+        const aList: AuditLogDoc[] = [];
+        auditSnap.forEach((snap) => {
+          aList.push({ id: snap.id, ...(snap.data() as Omit<AuditLogDoc, "id">) });
+        });
+        setAuditLogs(aList);
+      } catch (auditErr) {
+        console.warn("Audit logs access notice:", auditErr);
+      }
     } catch (err) {
       console.error("Failed to fetch admin data:", err);
     } finally {
