@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Loader2 } from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -31,7 +31,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-bold tracking-tight rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]";
+      "inline-flex items-center justify-center font-bold tracking-tight rounded-md transition-all duration-150 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer";
 
     const sizeStyles = {
       sm: "px-3 py-1.5 text-xs gap-1.5",
@@ -41,15 +41,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-600/25 border border-purple-500/30",
+        "bg-black text-white border border-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-neutral-200",
       secondary:
-        "bg-purple-950/30 hover:bg-purple-900/40 text-purple-300 border border-purple-500/30 hover:border-purple-500/50",
+        "bg-white text-black border border-neutral-300 hover:bg-neutral-100 dark:bg-black dark:text-white dark:border-neutral-700 dark:hover:bg-neutral-900",
       outline:
-        "bg-transparent hover:bg-white/5 text-gray-300 hover:text-white border border-gray-700 hover:border-gray-500",
+        "bg-transparent text-black border border-black hover:bg-neutral-100 dark:text-white dark:border-white dark:hover:bg-neutral-900",
       ghost:
-        "bg-transparent hover:bg-white/5 text-gray-400 hover:text-white",
+        "bg-transparent text-black hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-900",
       danger:
-        "bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/25 border border-rose-500/30",
+        "bg-black text-white border border-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-neutral-200",
     };
 
     return (
@@ -68,11 +68,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <GoogleIcon name="progress_activity" size={16} className="animate-spin" />
         ) : (
           <>
             {leftIcon && <span className="shrink-0">{leftIcon}</span>}
-            <span>{children}</span>
+            <span className="font-bold">{children}</span>
             {rightIcon && <span className="shrink-0">{rightIcon}</span>}
           </>
         )}

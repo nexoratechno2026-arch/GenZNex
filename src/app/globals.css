@@ -6,18 +6,7 @@
     --foreground: #ffffff;
     --card: #000000;
     --card-foreground: #ffffff;
-    --card-border: #333333;
-    --primary: #ffffff;
-    --primary-foreground: #000000;
-    --secondary: #171717;
-    --secondary-foreground: #ffffff;
-    --accent: #262626;
-    --accent-foreground: #ffffff;
-    --muted: #121212;
-    --muted-foreground: #cccccc;
     --border: #333333;
-    --input: #121212;
-    --ring: #ffffff;
   }
 
   .light {
@@ -25,46 +14,14 @@
     --foreground: #000000;
     --card: #ffffff;
     --card-foreground: #000000;
-    --card-border: #e5e5e5;
-    --primary: #000000;
-    --primary-foreground: #ffffff;
-    --secondary: #f4f4f5;
-    --secondary-foreground: #000000;
-    --accent: #e5e5e5;
-    --accent-foreground: #000000;
-    --muted: #f4f4f5;
-    --muted-foreground: #333333;
     --border: #e5e5e5;
-    --input: #f4f4f5;
-    --ring: #000000;
   }
 }
 
 /* 1. Global Typography: Every word in Arial */
-html,
-body,
-button,
-input,
-select,
-textarea,
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-span:not(.material-symbols-outlined),
-a,
-label,
-li,
-td,
-th,
-b,
-strong,
-em,
-i:not(.material-symbols-outlined),
-div:not(.material-symbols-outlined) {
+*,
+*::before,
+*::after {
   font-family: Arial, Helvetica, sans-serif !important;
 }
 
@@ -84,56 +41,113 @@ div:not(.material-symbols-outlined) {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 3. Base High Contrast Theme Rules */
+/* 3. Base High-Contrast Setup */
+body {
+  font-family: Arial, Helvetica, sans-serif !important;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Night Mode (Dark) Defaults */
+html.dark body,
 body {
   background-color: #000000;
   color: #ffffff;
-  overflow-x: hidden;
-  min-height: 100vh;
 }
 
-/* Night Mode (Default): Black Background, White Words */
-.dark body,
-body {
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6,
+html.dark p,
+html.dark label {
+  color: #ffffff;
+}
+
+/* Light Mode Defaults */
+html.light body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6,
+html.light p,
+html.light label {
+  color: #000000;
+}
+
+/* 4. Complete Button & High-Contrast Word Visibility Enforcement */
+/* Any black-background container or button MUST have pure white text */
+.bg-black,
+.bg-neutral-900,
+.bg-neutral-950,
+button.bg-black,
+button.bg-neutral-900,
+.glow-btn-primary,
+html.light button.bg-black,
+html.light a.bg-black {
   background-color: #000000 !important;
   color: #ffffff !important;
 }
 
-.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
-.dark p, .dark span:not(.material-symbols-outlined), .dark a, .dark li, .dark label {
-  color: #ffffff;
+.bg-black *,
+.bg-neutral-900 *,
+.bg-neutral-950 *,
+button.bg-black *,
+button.bg-neutral-900 *,
+.glow-btn-primary *,
+html.light button.bg-black *,
+html.light a.bg-black * {
+  color: #ffffff !important;
 }
 
-.dark header,
-.dark footer,
-.dark section,
-.dark main,
-.dark aside,
-.dark nav {
-  background-color: #000000;
-}
-
-/* Light Mode: White Background, Black Words */
-.light body {
-  background-color: #ffffff !important;
+/* Any white-background container or button MUST have pure black text */
+.bg-white,
+button.bg-white,
+.glow-btn-secondary,
+html.light button.bg-white,
+html.light a.bg-white,
+html.dark button.dark\:bg-white,
+html.dark a.dark\:bg-white {
   color: #000000 !important;
 }
 
-.light h1, .light h2, .light h3, .light h4, .light h5, .light h6,
-.light p, .light span:not(.material-symbols-outlined), .light a, .light li, .light label {
-  color: #000000;
+.bg-white *,
+button.bg-white *,
+.glow-btn-secondary *,
+html.light button.bg-white *,
+html.light a.bg-white *,
+html.dark button.dark\:bg-white *,
+html.dark a.dark\:bg-white * {
+  color: #000000 !important;
 }
 
-.light header,
-.light footer,
-.light section,
-.light main,
-.light aside,
-.light nav {
+/* Specific Dark Mode overrides for inverted components */
+html.dark .dark\:bg-black {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+html.dark .dark\:bg-black * {
+  color: #ffffff !important;
+}
+
+html.dark .dark\:bg-white {
   background-color: #ffffff !important;
+  color: #000000 !important;
+}
+html.dark .dark\:bg-white * {
+  color: #000000 !important;
 }
 
-/* 4. Disable all rainbow/gradient/attractive colors in words */
+/* 5. Disable all gradient or rainbow text */
 .glow-text-gradient,
 [class*="bg-clip-text"] {
   background: none !important;
@@ -141,77 +155,31 @@ body {
   color: inherit !important;
 }
 
-/* Panels and Cards in Monochrome */
-.glass-panel,
-.glass-card {
-  background-color: #000000 !important;
-  border-color: #333333 !important;
-  color: #ffffff !important;
+/* Cards & Panels */
+.glass-card,
+.glass-panel {
+  background-color: #000000;
+  border: 1px solid #333333;
+  color: #ffffff;
 }
 
-.light .glass-panel,
-.light .glass-card {
+html.light .glass-card,
+html.light .glass-panel {
   background-color: #ffffff !important;
-  border-color: #e5e5e5 !important;
+  border: 1px solid #e5e5e5 !important;
   color: #000000 !important;
 }
 
-/* High Contrast Primary Button: White in Dark Mode, Black in Light Mode */
-.glow-btn-primary {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border: 1px solid #ffffff !important;
-  box-shadow: none !important;
-  font-weight: bold;
-}
-
-.glow-btn-primary:hover {
-  background-color: #e5e5e5 !important;
-}
-
-.light .glow-btn-primary {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  border: 1px solid #000000 !important;
-}
-
-.light .glow-btn-primary:hover {
-  background-color: #262626 !important;
-}
-
-/* High Contrast Secondary Button */
-.glow-btn-secondary {
-  background-color: #000000 !important;
-  border: 1px solid #ffffff !important;
-  color: #ffffff !important;
-  box-shadow: none !important;
-  font-weight: bold;
-}
-
-.glow-btn-secondary:hover {
-  background-color: #1a1a1a !important;
-}
-
-.light .glow-btn-secondary {
-  background-color: #ffffff !important;
-  border: 1px solid #000000 !important;
-  color: #000000 !important;
-}
-
-.light .glow-btn-secondary:hover {
-  background-color: #f4f4f5 !important;
-}
-
-/* Background grid pattern */
+/* Grid Pattern */
 .bg-grid-pattern {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
 }
 
-.light .bg-grid-pattern {
+html.dark .bg-grid-pattern {
   background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
