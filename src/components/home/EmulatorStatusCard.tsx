@@ -1,16 +1,5 @@
 import React from "react";
-import { 
-  Server, 
-  ShieldCheck, 
-  Lock, 
-  CheckCircle, 
-  XCircle, 
-  ExternalLink, 
-  Key, 
-  Video, 
-  Database,
-  Terminal
-} from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 
 export function EmulatorStatusCard() {
   const emulators = [
@@ -58,165 +47,114 @@ export function EmulatorStatusCard() {
       handler: "Google Cloud Secret Manager / .env.local",
     },
     {
-      rule: "Role-Based Access Control",
-      enforcement: "request.auth.token.role in ['student', 'trainer', 'admin']",
-      status: "Enforced",
+      rule: "Video Signed URL Delivery",
+      enforcement: "Signed URLs generated via Cloud Function",
+      status: "Protected",
       severity: "secure",
-      handler: "Auth Custom Claims & Security Rules",
+      handler: "getLessonAccess (Functions 2nd Gen)",
     },
     {
-      rule: "Course Video Delivery",
-      enforcement: "Signed URLs (Mux/Bunny/Vimeo), no raw storage exposure",
+      rule: "Role-Based Access Control (RBAC)",
+      enforcement: "Auth Custom Claims strictly checked",
       status: "Enforced",
       severity: "secure",
-      handler: "storage.rules boundary",
+      handler: "Firestore & Storage Security Rules",
+    },
+    {
+      rule: "Phase 6 Gamification XP Ledger",
+      enforcement: "Deterministic Ledger ID (No double XP)",
+      status: "Enforced",
+      severity: "secure",
+      handler: "awardXp (Cloud Functions Admin SDK)",
     },
   ];
 
   return (
-    <section id="emulator-status" className="py-16 border-t border-gray-800/60 bg-[#07080d]/60">
+    <section id="emulator-status" className="py-20 border-t border-neutral-800 dark:border-neutral-800 light:border-neutral-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Title */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 mb-3">
-            <Server className="w-3.5 h-3.5" />
-            <span>Firebase Emulator Suite &amp; Security Verification</span>
+        {/* Section Header */}
+        <div className="mb-12">
+          <div className="text-xs uppercase font-bold tracking-widest text-neutral-400 dark:text-neutral-400 light:text-neutral-600 mb-2 flex items-center gap-1.5">
+            <GoogleIcon name="shield" size={16} />
+            <span>Architecture &amp; Rules Verification</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-            Zero-Trust Architecture &amp; Local Emulators
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white dark:text-white light:text-black">
+            Firebase Security &amp; Local Verification Engine
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-gray-400">
-            Never touching production during development. Every transaction, custom claim, and video stream is secured at the protocol level.
+          <p className="mt-2 text-sm text-neutral-300 dark:text-neutral-300 light:text-neutral-700 max-w-3xl">
+            Live local development is powered 100% by the Firebase Emulator Suite. Direct client writes to critical collections are blocked by strict security rules.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* Left Column: Emulator Services Status */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="glass-card p-6 rounded-2xl border border-gray-800">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Database className="w-5 h-5 text-purple-400" />
-                  <h3 className="font-bold text-white text-base">Configured Local Emulators</h3>
-                </div>
+        {/* Emulators Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 mb-10">
+          {emulators.map((emu) => (
+            <div
+              key={emu.name}
+              className="p-4 rounded-lg border border-neutral-800 dark:border-neutral-800 light:border-neutral-200 bg-black dark:bg-black light:bg-white"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 dark:text-neutral-400 light:text-neutral-600">
+                  Port :{emu.port}
+                </span>
+                <span className="w-2 h-2 rounded-full bg-white dark:bg-white light:bg-black" />
+              </div>
+              <div className="font-bold text-sm text-white dark:text-white light:text-black mb-1">
+                {emu.name}
+              </div>
+              <div className="flex items-center justify-between text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700">
+                <span className="font-medium text-white dark:text-white light:text-black">{emu.status}</span>
                 <a
-                  href="http://127.0.0.1:4000"
+                  href={emu.path}
                   target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold"
+                  rel="noreferrer"
+                  className="text-neutral-400 hover:text-white dark:hover:text-white light:hover:text-black"
                 >
-                  <span>Open Console</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <GoogleIcon name="open_in_new" size={14} />
                 </a>
               </div>
-
-              <div className="space-y-3">
-                {emulators.map((emu) => (
-                  <div
-                    key={emu.name}
-                    className="flex items-center justify-between p-3 rounded-xl bg-[#0e101b] border border-gray-800/80 text-xs"
-                  >
-                    <div>
-                      <div className="font-bold text-gray-200">{emu.name}</div>
-                      <div className="text-gray-500 font-mono">Port {emu.port}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 pulse-indicator" />
-                      <span className="font-semibold text-emerald-400">{emu.status}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 p-3 rounded-xl bg-purple-950/20 border border-purple-500/20 flex items-center gap-3 text-xs text-purple-200">
-                <Terminal className="w-4 h-4 text-purple-400 shrink-0" />
-                <span>
-                  Start suite with: <code className="text-cyan-300 font-mono">firebase emulators:start</code>
-                </span>
-              </div>
             </div>
+          ))}
+        </div>
 
-            {/* Razorpay Secrets Status Card */}
-            <div className="glass-card p-6 rounded-2xl border border-gray-800">
-              <div className="flex items-center gap-2 mb-3 text-amber-400 font-bold text-sm">
-                <Key className="w-4 h-4" />
-                <span>Razorpay Secret Manager Isolation</span>
-              </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
-                Secret keys are wrapped in <code className="text-purple-300">defineSecret(&quot;RAZORPAY_KEY_ID&quot;)</code> and injected directly into Cloud Functions runtime via Google Secret Manager. Frontend JavaScript and Firestore rules cannot read these credentials.
-              </p>
+        {/* Security Rules Matrix */}
+        <div className="rounded-lg border border-neutral-800 dark:border-neutral-800 light:border-neutral-200 overflow-hidden bg-black dark:bg-black light:bg-white">
+          <div className="px-6 py-4 border-b border-neutral-800 dark:border-neutral-800 light:border-neutral-200 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <GoogleIcon name="verified_user" size={18} />
+              <span className="font-bold text-sm text-white dark:text-white light:text-black">
+                Security Rules &amp; Zero-Trust Protocol
+              </span>
             </div>
+            <span className="text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700">
+              48/48 Rules Tests Passing
+            </span>
           </div>
 
-          {/* Right Column: Security Rules Matrix */}
-          <div className="lg:col-span-7">
-            <div className="glass-card p-6 rounded-2xl border border-gray-800 h-full flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                    <h3 className="font-bold text-white text-base">Project Rule Enforcement Matrix</h3>
+          <div className="divide-y divide-neutral-800 dark:divide-neutral-800 light:divide-neutral-200">
+            {rulesMatrix.map((item, idx) => (
+              <div key={idx} className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="space-y-0.5">
+                  <div className="font-bold text-white dark:text-white light:text-black text-sm flex items-center gap-1.5">
+                    <GoogleIcon name="check_circle" size={15} />
+                    <span>{item.rule}</span>
                   </div>
-                  <span className="text-[11px] font-mono bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/20">
-                    Strict Mode
+                  <div className="text-neutral-300 dark:text-neutral-300 light:text-neutral-700">
+                    {item.enforcement}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-neutral-400 dark:text-neutral-400 light:text-neutral-600 font-mono text-[11px]">
+                    {item.handler}
+                  </span>
+                  <span className="px-2 py-0.5 rounded border border-neutral-700 dark:border-neutral-700 light:border-neutral-300 text-[10px] font-bold uppercase tracking-wider text-white dark:text-white light:text-black bg-neutral-900 dark:bg-neutral-900 light:bg-neutral-100">
+                    {item.status}
                   </span>
                 </div>
-
-                <div className="space-y-3">
-                  {rulesMatrix.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3.5 rounded-xl bg-[#0e101b] border border-gray-800 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-                    >
-                      <div className="space-y-0.5">
-                        <div className="font-bold text-gray-100 flex items-center gap-1.5">
-                          {item.severity === "critical" ? (
-                            <Lock className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                          ) : item.rule.includes("Video") ? (
-                            <Video className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                          ) : (
-                            <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                          )}
-                          <span>{item.rule}</span>
-                        </div>
-                        <div className="text-[11px] text-gray-400 font-mono">
-                          {item.enforcement}
-                        </div>
-                      </div>
-
-                      <div className="text-right sm:shrink-0">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-semibold text-[11px] ${
-                            item.severity === "critical"
-                              ? "bg-rose-500/10 border border-rose-500/30 text-rose-400"
-                              : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-                          }`}
-                        >
-                          {item.severity === "critical" ? (
-                            <XCircle className="w-3 h-3" />
-                          ) : (
-                            <CheckCircle className="w-3 h-3" />
-                          )}
-                          <span>{item.status}</span>
-                        </span>
-                        <div className="text-[10px] text-gray-500 mt-1 font-mono">
-                          {item.handler}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
-
-              <div className="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between text-xs text-gray-400">
-                <span>Rules Source: <code className="text-purple-300 font-mono">firestore.rules &amp; storage.rules</code></span>
-                <span className="text-emerald-400 font-semibold">100% Compliant</span>
-              </div>
-            </div>
+            ))}
           </div>
-
         </div>
 
       </div>

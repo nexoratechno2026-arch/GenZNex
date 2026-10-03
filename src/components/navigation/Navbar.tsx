@@ -3,24 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useTheme } from "../theme/ThemeProvider";
-import { 
-  Sun, 
-  Moon, 
-  Menu, 
-  X, 
-  Zap, 
-  LayoutDashboard,
-  LogOut,
-  Bell,
-  Trophy,
-  MessageSquare,
-  BookOpen,
-  GraduationCap,
-  Briefcase,
-} from "lucide-react";
 import type { UserRole } from "@/types/schema";
 import { useAuth } from "@/lib/context/AuthContext";
 import { Button } from "../ui/Button";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 
 interface NavbarProps {
   currentRole?: UserRole;
@@ -43,23 +29,20 @@ export function Navbar({ currentRole }: NavbarProps) {
       : "/student";
 
   return (
-    <header className="sticky top-0 z-50 w-full glass-panel border-b border-gray-800/80 bg-[#090a0f]/90 backdrop-blur-md transition-colors duration-200">
+    <header className="sticky top-0 z-50 w-full border-b border-neutral-800 dark:border-neutral-800 light:border-neutral-200 bg-black dark:bg-black light:bg-white transition-colors duration-150">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         
-        {/* Brand Logo */}
+        {/* Brand Logo - Pure Black & White Arial */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 p-[2px] shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-[#0d0e17] rounded-[10px] flex items-center justify-center">
-                <Zap className="w-5 h-5 text-cyan-400 fill-cyan-400/20" />
-              </div>
+            <div className="w-9 h-9 rounded-lg bg-white dark:bg-white light:bg-black flex items-center justify-center text-black dark:text-black light:text-white font-bold">
+              <GoogleIcon name="bolt" size={22} filled />
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold tracking-tight text-xl leading-none flex items-center gap-1">
-                <span className="text-white">GenZ</span>
-                <span className="glow-text-gradient">Nex</span>
+              <span className="font-bold tracking-tight text-xl leading-none text-white dark:text-white light:text-black">
+                GenZNex
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400 mt-0.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 dark:text-neutral-400 light:text-neutral-600 mt-0.5">
                 EdTech India
               </span>
             </div>
@@ -70,216 +53,168 @@ export function Navbar({ currentRole }: NavbarProps) {
         <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">
           <Link 
             href="/courses" 
-            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+            className="text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black transition-colors flex items-center gap-1.5"
           >
-            <BookOpen className="w-4 h-4 text-purple-400" />
+            <GoogleIcon name="school" size={18} />
             <span>Courses</span>
           </Link>
           <Link 
             href="/programs" 
-            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+            className="text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black transition-colors flex items-center gap-1.5"
           >
-            <GraduationCap className="w-4 h-4 text-indigo-400" />
+            <GoogleIcon name="workspace_premium" size={18} />
             <span>Programs</span>
           </Link>
           <Link 
             href="/forum" 
-            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+            className="text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black transition-colors flex items-center gap-1.5"
           >
-            <MessageSquare className="w-4 h-4 text-cyan-400" />
+            <GoogleIcon name="forum" size={18} />
             <span>Doubts</span>
           </Link>
           <Link 
             href="/leaderboard" 
-            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+            className="text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black transition-colors flex items-center gap-1.5"
           >
-            <Trophy className="w-4 h-4 text-amber-400" />
+            <GoogleIcon name="leaderboard" size={18} />
             <span>Leaderboard</span>
           </Link>
           <Link 
             href="/jobs" 
-            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+            className="text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black transition-colors flex items-center gap-1.5"
           >
-            <Briefcase className="w-4 h-4 text-emerald-400" />
+            <GoogleIcon name="work" size={18} />
             <span>Jobs</span>
           </Link>
         </nav>
 
-        {/* Action Controls: Auth Status & Theme Toggle */}
-        <div className="hidden sm:flex items-center gap-3">
-          {/* Theme Toggle */}
+        {/* Right Section: Notifications, Theme Toggle, Auth/Dashboard */}
+        <div className="flex items-center gap-3">
+          
+          {/* Notifications link */}
+          <Link
+            href="/notifications"
+            className="p-2 text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black rounded-md transition-colors"
+            title="Notifications"
+          >
+            <GoogleIcon name="notifications" size={20} />
+          </Link>
+
+          {/* Theme Toggle (Night / Light) with Google Icons */}
           <button
-            id="theme-toggle-btn"
             onClick={toggleTheme}
-            aria-label="Toggle Dark / Light Theme"
-            className="p-2 rounded-xl border border-gray-800 bg-[#141525] text-gray-300 hover:text-white hover:border-purple-500/50 transition-colors shadow-sm"
+            className="p-2 text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black rounded-md transition-colors cursor-pointer border border-neutral-800 dark:border-neutral-800 light:border-neutral-300"
+            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Night Mode"}
+            aria-label="Toggle theme"
           >
             {theme === "dark" ? (
-              <Sun className="w-4 h-4 text-amber-400" />
+              <GoogleIcon name="light_mode" size={18} />
             ) : (
-              <Moon className="w-4 h-4 text-purple-400" />
+              <GoogleIcon name="dark_mode" size={18} />
             )}
           </button>
 
-          {/* User Auth Buttons */}
+          {/* User state or login buttons */}
           {user ? (
-            <div className="flex items-center gap-2.5">
-              <Link 
-                href="/notifications"
-                title="Notifications"
-                className="relative p-2 rounded-xl border border-gray-800 bg-[#141525] text-gray-300 hover:text-white hover:border-purple-500/50 transition-colors"
-                id="nav-notifications-btn"
-              >
-                <Bell className="w-4 h-4" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50" />
-              </Link>
+            <div className="flex items-center gap-2">
               <Link href={dashboardHref}>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  leftIcon={<LayoutDashboard className="w-3.5 h-3.5" />}
-                  id="nav-dashboard-btn"
+                <Button 
+                  size="sm" 
+                  className="bg-white text-black hover:bg-neutral-200 dark:bg-white dark:text-black dark:hover:bg-neutral-200 light:bg-black light:text-white light:hover:bg-neutral-800 font-bold text-xs uppercase tracking-wider px-3.5 py-1.5 flex items-center gap-1.5 rounded"
                 >
-                  Dashboard
+                  <GoogleIcon name="dashboard" size={16} />
+                  <span>Dashboard</span>
                 </Button>
               </Link>
               <button
                 onClick={() => logout()}
-                title="Sign Out"
-                className="p-2 rounded-xl border border-gray-800 bg-[#141525] text-rose-400 hover:bg-rose-500/10 transition-colors"
-                id="nav-logout-btn"
+                className="p-2 text-neutral-400 hover:text-white dark:hover:text-white light:hover:text-black rounded-md transition-colors cursor-pointer"
+                title="Sign out"
               >
-                <LogOut className="w-4 h-4" />
+                <GoogleIcon name="logout" size={18} />
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/login">
-                <Button variant="ghost" size="sm" id="nav-login-btn">
+              <Link href="/auth/login">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black font-semibold text-xs px-3 py-1.5"
+                >
                   Sign In
                 </Button>
               </Link>
-              <Link href="/signup">
-                <Button variant="primary" size="sm" id="nav-signup-btn">
+              <Link href="/auth/register">
+                <Button 
+                  size="sm" 
+                  className="bg-white text-black hover:bg-neutral-200 dark:bg-white dark:text-black dark:hover:bg-neutral-200 light:bg-black light:text-white light:hover:bg-neutral-800 font-bold text-xs px-3.5 py-1.5 rounded"
+                >
                   Get Started
                 </Button>
               </Link>
             </div>
           )}
-        </div>
 
-        {/* Mobile menu trigger */}
-        <div className="flex lg:hidden items-center gap-2">
+          {/* Mobile Menu Hamburger */}
           <button
-            onClick={toggleTheme}
-            className="p-2 rounded-xl border border-gray-800 bg-[#141525] text-gray-300"
-            aria-label="Toggle theme"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 text-neutral-300 dark:text-neutral-300 light:text-neutral-700 hover:text-white dark:hover:text-white light:hover:text-black rounded-md cursor-pointer"
+            aria-label="Toggle menu"
           >
-            {theme === "dark" ? (
-              <Sun className="w-4 h-4 text-amber-400" />
+            {mobileMenuOpen ? (
+              <GoogleIcon name="close" size={22} />
             ) : (
-              <Moon className="w-4 h-4 text-purple-400" />
+              <GoogleIcon name="menu" size={22} />
             )}
           </button>
-          <button
-            id="mobile-menu-btn"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl border border-gray-800 bg-[#141525] text-gray-300 hover:text-white"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
         </div>
+
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="lg:hidden px-4 pt-3 pb-6 border-t border-gray-800 bg-[#0d0e17] space-y-4">
-          <div className="flex flex-col gap-1 font-medium text-sm">
-            <Link 
-              href="/courses" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
-            >
-              <BookOpen className="w-4 h-4 text-purple-400" />
-              <span>Courses</span>
-            </Link>
-            <Link 
-              href="/programs" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
-            >
-              <GraduationCap className="w-4 h-4 text-indigo-400" />
-              <span>Cohort Programs</span>
-            </Link>
-            <Link 
-              href="/forum" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
-            >
-              <MessageSquare className="w-4 h-4 text-cyan-400" />
-              <span>Doubts &amp; Discussion</span>
-            </Link>
-            <Link 
-              href="/leaderboard" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
-            >
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span>Leaderboard</span>
-            </Link>
-            <Link 
-              href="/jobs" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
-            >
-              <Briefcase className="w-4 h-4 text-emerald-400" />
-              <span>Placement Jobs</span>
-            </Link>
-          </div>
-
-          {/* Auth options in mobile menu */}
-          <div className="pt-2 border-t border-gray-800 space-y-2">
-            {user ? (
-              <div className="space-y-2">
-                <Link
-                  href={dashboardHref}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-md shadow-purple-600/30"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span>Go to Dashboard</span>
-                </Link>
-                <button
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs text-rose-400 bg-rose-500/10 font-bold"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Sign Out</span>
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-2">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 rounded-xl border border-gray-800 text-center font-bold text-xs text-gray-300 hover:bg-gray-800"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 rounded-xl bg-purple-600 text-center font-bold text-xs text-white shadow-md shadow-purple-600/30"
-                >
-                  Get Started
-                </Link>
-              </div>
-            )}
-          </div>
+        <div className="lg:hidden border-t border-neutral-800 dark:border-neutral-800 light:border-neutral-200 bg-black dark:bg-black light:bg-white px-4 py-4 space-y-3">
+          <Link 
+            href="/courses" 
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 text-neutral-200 dark:text-neutral-200 light:text-neutral-800 py-2 font-medium"
+          >
+            <GoogleIcon name="school" size={18} />
+            <span>Courses</span>
+          </Link>
+          <Link 
+            href="/programs" 
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 text-neutral-200 dark:text-neutral-200 light:text-neutral-800 py-2 font-medium"
+          >
+            <GoogleIcon name="workspace_premium" size={18} />
+            <span>Programs</span>
+          </Link>
+          <Link 
+            href="/forum" 
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 text-neutral-200 dark:text-neutral-200 light:text-neutral-800 py-2 font-medium"
+          >
+            <GoogleIcon name="forum" size={18} />
+            <span>Doubts</span>
+          </Link>
+          <Link 
+            href="/leaderboard" 
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 text-neutral-200 dark:text-neutral-200 light:text-neutral-800 py-2 font-medium"
+          >
+            <GoogleIcon name="leaderboard" size={18} />
+            <span>Leaderboard</span>
+          </Link>
+          <Link 
+            href="/jobs" 
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 text-neutral-200 dark:text-neutral-200 light:text-neutral-800 py-2 font-medium"
+          >
+            <GoogleIcon name="work" size={18} />
+            <span>Jobs</span>
+          </Link>
         </div>
       )}
     </header>

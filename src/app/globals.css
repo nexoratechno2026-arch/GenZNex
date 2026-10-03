@@ -2,152 +2,216 @@
 
 @layer base {
   :root {
-    --background: #090a0f;
-    --foreground: #f3f4f6;
-    --card: #12141e;
-    --card-foreground: #f9fafb;
-    --card-border: #1f2438;
-    --primary: #8b5cf6;
-    --primary-glow: rgba(139, 92, 246, 0.4);
-    --secondary: #06b6d4;
-    --secondary-glow: rgba(6, 182, 212, 0.35);
-    --accent: #10b981;
-    --accent-glow: rgba(16, 185, 129, 0.35);
-    --muted: #1e2235;
-    --muted-foreground: #9ca3af;
-    --border: #23283e;
-    --input: #1a1e30;
-    --ring: #a855f7;
+    --background: #000000;
+    --foreground: #ffffff;
+    --card: #000000;
+    --card-foreground: #ffffff;
+    --card-border: #333333;
+    --primary: #ffffff;
+    --primary-foreground: #000000;
+    --secondary: #171717;
+    --secondary-foreground: #ffffff;
+    --accent: #262626;
+    --accent-foreground: #ffffff;
+    --muted: #121212;
+    --muted-foreground: #cccccc;
+    --border: #333333;
+    --input: #121212;
+    --ring: #ffffff;
   }
 
   .light {
-    --background: #f8fafc;
-    --foreground: #0f172a;
+    --background: #ffffff;
+    --foreground: #000000;
     --card: #ffffff;
-    --card-foreground: #0f172a;
-    --card-border: #e2e8f0;
-    --primary: #7c3aed;
-    --primary-glow: rgba(124, 58, 237, 0.2);
-    --secondary: #0284c7;
-    --secondary-glow: rgba(2, 132, 199, 0.2);
-    --accent: #059669;
-    --accent-glow: rgba(5, 150, 105, 0.2);
-    --muted: #f1f5f9;
-    --muted-foreground: #64748b;
-    --border: #e2e8f0;
-    --input: #f1f5f9;
-    --ring: #7c3aed;
+    --card-foreground: #000000;
+    --card-border: #e5e5e5;
+    --primary: #000000;
+    --primary-foreground: #ffffff;
+    --secondary: #f4f4f5;
+    --secondary-foreground: #000000;
+    --accent: #e5e5e5;
+    --accent-foreground: #000000;
+    --muted: #f4f4f5;
+    --muted-foreground: #333333;
+    --border: #e5e5e5;
+    --input: #f4f4f5;
+    --ring: #000000;
   }
 }
 
+/* 1. Global Typography: Every word in Arial */
+html,
+body,
+button,
+input,
+select,
+textarea,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span:not(.material-symbols-outlined),
+a,
+label,
+li,
+td,
+th,
+b,
+strong,
+em,
+i:not(.material-symbols-outlined),
+div:not(.material-symbols-outlined) {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+/* 2. Google Material Symbols Font Protection */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 3. Base High Contrast Theme Rules */
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #000000;
+  color: #ffffff;
   overflow-x: hidden;
   min-height: 100vh;
-  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Glassmorphism & High-Energy Gen Z Effects */
-.glass-panel {
-  background: rgba(18, 20, 30, 0.7);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--border);
+/* Night Mode (Default): Black Background, White Words */
+.dark body,
+body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
 }
 
-.light .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid var(--border);
-}
-
-.glass-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%), var(--card);
-  border: 1px solid var(--card-border);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.glass-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow: 0 12px 30px -10px var(--primary-glow);
-}
-
-.light .glass-card {
-  background: #ffffff;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-}
-
-.light .glass-card:hover {
-  border-color: #8b5cf6;
-  box-shadow: 0 16px 32px -8px rgba(139, 92, 246, 0.15);
-}
-
-.glow-text-gradient {
-  background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 50%, #34d399 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.glow-btn-primary {
-  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+.dark p, .dark span:not(.material-symbols-outlined), .dark a, .dark li, .dark label {
   color: #ffffff;
-  box-shadow: 0 4px 18px var(--primary-glow);
-  transition: all 0.2s ease;
+}
+
+.dark header,
+.dark footer,
+.dark section,
+.dark main,
+.dark aside,
+.dark nav {
+  background-color: #000000;
+}
+
+/* Light Mode: White Background, Black Words */
+.light body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6,
+.light p, .light span:not(.material-symbols-outlined), .light a, .light li, .light label {
+  color: #000000;
+}
+
+.light header,
+.light footer,
+.light section,
+.light main,
+.light aside,
+.light nav {
+  background-color: #ffffff !important;
+}
+
+/* 4. Disable all rainbow/gradient/attractive colors in words */
+.glow-text-gradient,
+[class*="bg-clip-text"] {
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: inherit !important;
+}
+
+/* Panels and Cards in Monochrome */
+.glass-panel,
+.glass-card {
+  background-color: #000000 !important;
+  border-color: #333333 !important;
+  color: #ffffff !important;
+}
+
+.light .glass-panel,
+.light .glass-card {
+  background-color: #ffffff !important;
+  border-color: #e5e5e5 !important;
+  color: #000000 !important;
+}
+
+/* High Contrast Primary Button: White in Dark Mode, Black in Light Mode */
+.glow-btn-primary {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: none !important;
+  font-weight: bold;
 }
 
 .glow-btn-primary:hover {
-  background: linear-gradient(135deg, #8b5cf6 0%, #4f46e5 100%);
-  box-shadow: 0 6px 24px var(--primary-glow);
-  transform: translateY(-1px);
+  background-color: #e5e5e5 !important;
 }
 
+.light .glow-btn-primary {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.light .glow-btn-primary:hover {
+  background-color: #262626 !important;
+}
+
+/* High Contrast Secondary Button */
 .glow-btn-secondary {
-  background: rgba(139, 92, 246, 0.12);
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  color: #c4b5fd;
-  transition: all 0.2s ease;
-}
-
-.light .glow-btn-secondary {
-  background: rgba(124, 58, 237, 0.08);
-  border: 1px solid rgba(124, 58, 237, 0.25);
-  color: #6d28d9;
+  background-color: #000000 !important;
+  border: 1px solid #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  font-weight: bold;
 }
 
 .glow-btn-secondary:hover {
-  background: rgba(139, 92, 246, 0.25);
-  border-color: rgba(139, 92, 246, 0.6);
+  background-color: #1a1a1a !important;
+}
+
+.light .glow-btn-secondary {
+  background-color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+}
+
+.light .glow-btn-secondary:hover {
+  background-color: #f4f4f5 !important;
 }
 
 /* Background grid pattern */
 .bg-grid-pattern {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
 .light .bg-grid-pattern {
   background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
-}
-
-/* Pulse animation for emulator badge */
-@keyframes emulator-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.15);
-  }
-}
-
-.pulse-indicator {
-  animation: emulator-pulse 2s infinite ease-in-out;
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
 }

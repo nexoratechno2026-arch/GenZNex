@@ -2,8 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { Star, Clock, BookOpen, Sparkles } from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import { CourseDoc } from "@/types/schema";
 
 interface CourseCardProps {
@@ -30,53 +29,41 @@ export function CourseCard({ course }: CourseCardProps) {
   const originalPrice = hasDiscount ? course.priceInPaise : undefined;
   const discountPercent = calculateDiscount(course.priceInPaise, course.discountPriceInPaise);
 
-  const levelColorMap: Record<string, string> = {
-    beginner: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    intermediate: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    advanced: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20",
-    all_levels: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
-  };
-
-  const levelBadgeClass = levelColorMap[course.level] || levelColorMap.all_levels;
-
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group relative flex flex-col rounded-2xl border border-zinc-200/80 bg-white/90 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-xl hover:shadow-violet-500/10 dark:border-zinc-800/80 dark:bg-zinc-900/90 overflow-hidden"
+      className="group relative flex flex-col rounded-lg border border-neutral-800 dark:border-neutral-800 light:border-neutral-200 bg-black dark:bg-black light:bg-white transition-all duration-200 hover:border-white dark:hover:border-white light:hover:border-black overflow-hidden"
     >
       {/* Thumbnail Container */}
-      <div className="relative aspect-video w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+      <div className="relative aspect-video w-full overflow-hidden bg-neutral-900 dark:bg-neutral-900 light:bg-neutral-100">
         <img
           src={course.thumbnailUrl || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=450&fit=crop"}
           alt={course.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
         />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-        {/* Level & Language Badges */}
+        {/* Level & Language Badges in Monochrome */}
         <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
-          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider border backdrop-blur-md ${levelBadgeClass}`}>
+          <span className="rounded bg-black/80 dark:bg-black/80 light:bg-white/90 text-white dark:text-white light:text-black px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider border border-neutral-700 dark:border-neutral-700 light:border-neutral-300">
             {course.level}
           </span>
-          <span className="rounded-full bg-black/60 px-2 py-0.5 text-xs font-medium text-white/90 backdrop-blur-md border border-white/10">
+          <span className="rounded bg-black/80 dark:bg-black/80 light:bg-white/90 text-white dark:text-white light:text-black px-2 py-0.5 text-[11px] font-bold border border-neutral-700 dark:border-neutral-700 light:border-neutral-300">
             {course.language}
           </span>
         </div>
 
         {/* Discount Badge */}
         {discountPercent && (
-          <div className="absolute top-3 right-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 px-2.5 py-0.5 text-xs font-bold text-white shadow-md">
+          <div className="absolute top-3 right-3 rounded bg-white text-black dark:bg-white dark:text-black light:bg-black light:text-white px-2 py-0.5 text-xs font-bold border border-neutral-400">
             {discountPercent}% OFF
           </div>
         )}
 
         {/* Featured Ribbon */}
         {course.isFeatured && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-semibold text-black shadow-md">
-            <Sparkles className="h-3 w-3" />
+          <div className="absolute bottom-3 left-3 flex items-center gap-1 rounded bg-black/90 text-white dark:bg-black/90 dark:text-white light:bg-white/95 light:text-black px-2 py-0.5 text-xs font-bold border border-neutral-700 dark:border-neutral-700 light:border-neutral-300">
+            <GoogleIcon name="stars" size={14} />
             <span>Featured</span>
           </div>
         )}
@@ -85,79 +72,53 @@ export function CourseCard({ course }: CourseCardProps) {
       {/* Course Info */}
       <div className="flex flex-1 flex-col p-5">
         {/* Category */}
-        <p className="text-xs font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400">
+        <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400 light:text-neutral-600">
           {course.categoryName || course.category}
         </p>
 
         {/* Title */}
-        <h3 className="mt-1.5 text-base font-bold text-zinc-900 transition-colors group-hover:text-violet-600 dark:text-zinc-100 dark:group-hover:text-violet-400 line-clamp-2">
+        <h3 className="mt-1.5 text-base font-bold text-white dark:text-white light:text-black line-clamp-2">
           {course.title}
         </h3>
 
         {/* Subtitle */}
-        <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2 flex-1">
+        <p className="mt-1 text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700 line-clamp-2 flex-1">
           {course.subtitle || course.description}
         </p>
 
-        {/* Instructor */}
-        <div className="mt-4 flex items-center gap-2.5 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-          <img
-            src={course.instructor?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop"}
-            alt={course.instructor?.name || "Instructor"}
-            className="h-6 w-6 rounded-full object-cover ring-1 ring-zinc-200 dark:ring-zinc-700"
-          />
-          <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate">
-            {course.instructor?.name || "GenZNex Mentor"}
-          </span>
+        {/* Meta details */}
+        <div className="mt-4 flex items-center gap-4 text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700 pt-3 border-t border-neutral-800 dark:border-neutral-800 light:border-neutral-200">
+          <div className="flex items-center gap-1">
+            <GoogleIcon name="schedule" size={15} />
+            <span>{course.estimatedHours || 0} hrs</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <GoogleIcon name="menu_book" size={15} />
+            <span>{course.lessonCount || 0} lessons</span>
+          </div>
+          {course.ratingCount > 0 && (
+            <div className="flex items-center gap-1 ml-auto font-bold text-white dark:text-white light:text-black">
+              <GoogleIcon name="star" size={15} filled />
+              <span>{course.rating.toFixed(1)}</span>
+            </div>
+          )}
         </div>
 
-        {/* Rating and Metadata */}
-        <div className="mt-2.5 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-          <div className="flex items-center gap-1 font-semibold text-amber-500">
-            <Star className="h-3.5 w-3.5 fill-current" />
-            <span>{course.rating ? course.rating.toFixed(1) : "New"}</span>
-            {course.ratingCount ? (
-              <span className="font-normal text-zinc-400">({course.ratingCount})</span>
-            ) : null}
-          </div>
-
-          <div className="flex items-center gap-3 text-xs">
-            <span className="flex items-center gap-1">
-              <BookOpen className="h-3.5 w-3.5" />
-              {course.lessonCount || 0} lessons
-            </span>
-            {course.totalDurationMinutes ? (
-              <span className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5" />
-                {Math.round(course.totalDurationMinutes / 60)}h
-              </span>
-            ) : null}
-          </div>
-        </div>
-
-        {/* Price Tag */}
-        <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-3 dark:border-zinc-800">
+        {/* Price & Checkout Link */}
+        <div className="mt-4 flex items-center justify-between pt-2">
           <div className="flex items-baseline gap-2">
-            {isFree ? (
-              <span className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400">
-                FREE
+            <span className="text-lg font-bold text-white dark:text-white light:text-black">
+              {formatPrice(currentPrice)}
+            </span>
+            {originalPrice && (
+              <span className="text-xs text-neutral-500 line-through">
+                {formatPrice(originalPrice)}
               </span>
-            ) : (
-              <>
-                <span className="text-lg font-extrabold text-zinc-900 dark:text-white">
-                  {formatPrice(currentPrice)}
-                </span>
-                {originalPrice && (
-                  <span className="text-xs text-zinc-400 line-through">
-                    {formatPrice(originalPrice)}
-                  </span>
-                )}
-              </>
             )}
           </div>
-
-          <span className="rounded-lg bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700 transition-colors group-hover:bg-violet-600 group-hover:text-white dark:bg-violet-950/60 dark:text-violet-300 dark:group-hover:bg-violet-600">
-            View Course →
+          <span className="text-xs font-bold text-white dark:text-white light:text-black flex items-center gap-1 underline underline-offset-2">
+            <span>Details</span>
+            <GoogleIcon name="arrow_forward" size={14} />
           </span>
         </div>
       </div>
