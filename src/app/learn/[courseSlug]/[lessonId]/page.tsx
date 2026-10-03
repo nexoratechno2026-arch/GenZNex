@@ -175,12 +175,20 @@ export default function LearningPlayerPage() {
         setCurrentLesson(targetLesson);
 
         // Fetch Quizzes on course
-        const quizzesSnap = await getDocs(collection(db, "courses", courseData.id, "quizzes"));
-        setQuizzes(quizzesSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        try {
+          const quizzesSnap = await getDocs(collection(db, "courses", courseData.id, "quizzes"));
+          setQuizzes(quizzesSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        } catch (quizErr) {
+          console.warn("Course quizzes fetch notice:", quizErr);
+        }
 
         // Fetch Assignments on course
-        const assignmentsSnap = await getDocs(collection(db, "courses", courseData.id, "assignments"));
-        setAssignments(assignmentsSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        try {
+          const assignmentsSnap = await getDocs(collection(db, "courses", courseData.id, "assignments"));
+          setAssignments(assignmentsSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        } catch (assignErr) {
+          console.warn("Course assignments fetch notice:", assignErr);
+        }
 
         // 2. Fetch Lesson Access via Cloud Function
         if (targetLesson) {
