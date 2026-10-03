@@ -66,9 +66,12 @@ service cloud.firestore {
 
     // 2. Courses Collection & Subcollections
     match /courses/{courseId} {
-      allow read: if isCoursePublished(resource.data)
+      allow get: if isCoursePublished(resource.data)
+        || isEnrolled(courseId)
         || isAdmin()
         || (isTrainer() && isCourseOwner(resource.data));
+
+      allow list: if true;
 
       allow create: if (isTrainer() && isCourseOwner(request.resource.data))
         || isAdmin();
@@ -80,9 +83,7 @@ service cloud.firestore {
       allow delete: if isAdmin() || (isTrainer() && isCourseOwner(resource.data));
 
       match /modules/{moduleId} {
-        allow read: if isCoursePublished(get(/databases/$(database)/documents/courses/$(courseId)).data)
-          || isAdmin()
-          || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+        allow read: if true;
 
         allow write: if isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
 
