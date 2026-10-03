@@ -651,8 +651,7 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
                   className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-white focus:border-violet-500 focus:outline-none"
                 >
                   <option value="English">English</option>
-                  <option value="Hinglish">Hinglish</option>
-                  <option value="Hindi">Hindi</option>
+                  <option value="Tamil">Tamil</option>
                 </select>
               </div>
             </div>

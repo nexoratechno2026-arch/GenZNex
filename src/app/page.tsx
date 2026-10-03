@@ -14,11 +14,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-grid-pattern">
       {/* Navigation */}
-      <Navbar
-        currentRole={currentRole}
-        onRoleChange={setCurrentRole}
-        isEmulatorActive={true}
-      />
+      <Navbar />
 
       {/* Main Content */}
       <main className="flex-1">

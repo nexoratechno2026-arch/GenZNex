@@ -26,7 +26,7 @@ export function Footer() {
             </p>
             <div className="text-[11px] text-gray-500 space-y-0.5 pt-1">
               <p><strong>CIN:</strong> U80900DL2026PTC998877 | <strong>GSTIN:</strong> 07AABCU9603R1ZM</p>
-              <p>Two Horizon Center, DLF Phase 5, Gurugram, Haryana 122002</p>
+              <p>241, East Permanur, Anna Park Backside, Salem-7, Tamil Nadu 636007</p>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500 pt-1">
               <span className="flex items-center gap-1 text-emerald-400">

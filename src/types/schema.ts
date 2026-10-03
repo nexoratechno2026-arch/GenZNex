@@ -36,7 +36,7 @@ export type CourseCategory =
   | string;
 
 export type CourseLevel = "beginner" | "intermediate" | "advanced" | "all_levels";
-export type CourseLanguage = "English" | "Hinglish" | "Hindi";
+export type CourseLanguage = "English" | "Tamil";
 
 export interface CourseInstructor {
   uid: string;
@@ -465,7 +465,7 @@ export interface PaymentConfigDoc {
   gstRatePercent: number; // default: 18
   businessName: string; // "GenZNex EdTech Private Limited"
   gstin: string; // "27AABCU9603R1ZM"
-  businessAddress: string; // "Level 4, Cyber City, Gurugram, Haryana 122002, India"
+  businessAddress: string; // "241, East Permanur, Anna Park Backside, Salem-7, Tamil Nadu 636007, India"
   invoicePrefix: string; // "GZN-INV-2026-"
   currentInvoiceSequence: number; // e.g. 1000
   refundWindowDays: number; // default: 7
@@ -1256,7 +1256,7 @@ export interface FcmTokenDoc {
 }
 
 // --- 3. Discussion Forum & Doubt Clearing Types ---
-export type ForumScopeType = "course" | "batch";
+export type ForumScopeType = "course" | "batch" | "global";
 
 export interface ForumPostDoc {
   id: string;

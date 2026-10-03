@@ -9,16 +9,14 @@ import {
   Menu, 
   X, 
   Zap, 
-  ShieldCheck, 
-  UserCheck, 
-  Layers, 
-  ExternalLink,
   LayoutDashboard,
   LogOut,
-  User as UserIcon,
   Bell,
   Trophy,
   MessageSquare,
+  BookOpen,
+  GraduationCap,
+  Briefcase,
 } from "lucide-react";
 import type { UserRole } from "@/types/schema";
 import { useAuth } from "@/lib/context/AuthContext";
@@ -30,12 +28,12 @@ interface NavbarProps {
   isEmulatorActive?: boolean;
 }
 
-export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: NavbarProps) {
+export function Navbar({ currentRole }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
-  const { user, userProfile, role: contextRole, logout } = useAuth();
+  const { user, role: contextRole, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const activeRole = currentRole || contextRole;
+  const activeRole = currentRole || contextRole || "student";
 
   const dashboardHref =
     activeRole === "admin"
@@ -45,10 +43,10 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
       : "/student";
 
   return (
-    <header className="sticky top-0 z-50 w-full glass-panel border-b transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full glass-panel border-b border-gray-800/80 bg-[#090a0f]/90 backdrop-blur-md transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         
-        {/* Logo */}
+        {/* Brand Logo */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 p-[2px] shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform">
@@ -66,92 +64,55 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
               </span>
             </div>
           </Link>
-
-          {/* Emulator Status Indicator Badge */}
-          {isEmulatorActive && (
-            <div className="hidden lg:flex items-center gap-2 ml-4 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 pulse-indicator" />
-              <span>Firebase Emulators Active</span>
-              <span className="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded text-emerald-300">
-                Demo
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Desktop Nav Items */}
-        <nav className="hidden md:flex items-center gap-5 text-sm font-medium">
+        <nav className="hidden lg:flex items-center gap-6 text-sm font-medium">
           <Link 
-            href="/#courses" 
-            className="text-gray-300 hover:text-white transition-colors"
+            href="/courses" 
+            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
           >
-            Courses
+            <BookOpen className="w-4 h-4 text-purple-400" />
+            <span>Courses</span>
+          </Link>
+          <Link 
+            href="/programs" 
+            className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+          >
+            <GraduationCap className="w-4 h-4 text-indigo-400" />
+            <span>Programs</span>
           </Link>
           <Link 
             href="/forum" 
             className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+            <MessageSquare className="w-4 h-4 text-cyan-400" />
             <span>Doubts</span>
           </Link>
           <Link 
             href="/leaderboard" 
             className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
           >
-            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+            <Trophy className="w-4 h-4 text-amber-400" />
             <span>Leaderboard</span>
           </Link>
           <Link 
-            href="/#emulator-status" 
+            href="/jobs" 
             className="text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
           >
-            <Layers className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Architecture &amp; Rules</span>
+            <Briefcase className="w-4 h-4 text-emerald-400" />
+            <span>Jobs</span>
           </Link>
-          <a 
-            href="http://127.0.0.1:4000" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-cyan-300 transition-colors flex items-center gap-1 text-xs"
-          >
-            <span>Emulator UI</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
         </nav>
 
-        {/* Action Controls: Auth Status, Role Switcher & Theme Toggle */}
+        {/* Action Controls: Auth Status & Theme Toggle */}
         <div className="hidden sm:flex items-center gap-3">
-          
-          {/* RBAC Role Switcher (Visible in dev emulator) */}
-          {onRoleChange && (
-            <div className="flex items-center bg-[#161928] border border-gray-700/60 rounded-lg p-1 text-xs">
-              <span className="px-2 text-gray-400 flex items-center gap-1">
-                <UserCheck className="w-3.5 h-3.5 text-purple-400" />
-                Role:
-              </span>
-              {(["student", "trainer", "admin"] as UserRole[]).map((role) => (
-                <button
-                  key={role}
-                  id={`role-btn-${role}`}
-                  onClick={() => onRoleChange(role)}
-                  className={`px-2.5 py-1 rounded-md capitalize font-medium transition-all ${
-                    activeRole === role
-                      ? "bg-purple-600 text-white shadow-sm shadow-purple-600/50"
-                      : "text-gray-400 hover:text-gray-200"
-                  }`}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Theme Toggle */}
           <button
             id="theme-toggle-btn"
             onClick={toggleTheme}
             aria-label="Toggle Dark / Light Theme"
-            className="p-2 rounded-lg border border-gray-700/60 bg-[#161928] text-gray-300 hover:text-white hover:border-purple-500/50 transition-colors"
+            className="p-2 rounded-xl border border-gray-800 bg-[#141525] text-gray-300 hover:text-white hover:border-purple-500/50 transition-colors shadow-sm"
           >
             {theme === "dark" ? (
               <Sun className="w-4 h-4 text-amber-400" />
@@ -160,13 +121,13 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
             )}
           </button>
 
-          {/* User Auth Buttons / Profile Menu */}
+          {/* User Auth Buttons */}
           {user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <Link 
                 href="/notifications"
                 title="Notifications"
-                className="relative p-2 rounded-lg border border-gray-700/60 bg-[#161928] text-gray-300 hover:text-white hover:border-purple-500/50 transition-colors"
+                className="relative p-2 rounded-xl border border-gray-800 bg-[#141525] text-gray-300 hover:text-white hover:border-purple-500/50 transition-colors"
                 id="nav-notifications-btn"
               >
                 <Bell className="w-4 h-4" />
@@ -185,7 +146,7 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
               <button
                 onClick={() => logout()}
                 title="Sign Out"
-                className="p-2 rounded-lg border border-gray-700/60 bg-[#161928] text-rose-400 hover:bg-rose-500/10 transition-colors"
+                className="p-2 rounded-xl border border-gray-800 bg-[#141525] text-rose-400 hover:bg-rose-500/10 transition-colors"
                 id="nav-logout-btn"
               >
                 <LogOut className="w-4 h-4" />
@@ -208,10 +169,10 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
         </div>
 
         {/* Mobile menu trigger */}
-        <div className="flex sm:hidden items-center gap-2">
+        <div className="flex lg:hidden items-center gap-2">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg border border-gray-700/60 bg-[#161928] text-gray-300"
+            className="p-2 rounded-xl border border-gray-800 bg-[#141525] text-gray-300"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (
@@ -223,7 +184,7 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
           <button
             id="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg border border-gray-700/60 bg-[#161928] text-gray-300"
+            className="p-2 rounded-xl border border-gray-800 bg-[#141525] text-gray-300 hover:text-white"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -233,32 +194,48 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="sm:hidden px-4 pt-3 pb-6 border-t border-gray-800 bg-[#0d0e17] space-y-4">
-          <div className="flex flex-col gap-2 font-medium text-sm">
+        <div className="lg:hidden px-4 pt-3 pb-6 border-t border-gray-800 bg-[#0d0e17] space-y-4">
+          <div className="flex flex-col gap-1 font-medium text-sm">
             <Link 
-              href="/#courses" 
+              href="/courses" 
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200"
+              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
             >
-              Courses
+              <BookOpen className="w-4 h-4 text-purple-400" />
+              <span>Courses</span>
             </Link>
             <Link 
-              href="/#emulator-status" 
+              href="/programs" 
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center justify-between"
+              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
             >
-              <span>Architecture &amp; Security</span>
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <GraduationCap className="w-4 h-4 text-indigo-400" />
+              <span>Cohort Programs</span>
             </Link>
-            <a 
-              href="http://127.0.0.1:4000" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-cyan-400 flex items-center justify-between"
+            <Link 
+              href="/forum" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
             >
-              <span>Emulator UI (Port 4000)</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
+              <MessageSquare className="w-4 h-4 text-cyan-400" />
+              <span>Doubts &amp; Discussion</span>
+            </Link>
+            <Link 
+              href="/leaderboard" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
+            >
+              <Trophy className="w-4 h-4 text-amber-400" />
+              <span>Leaderboard</span>
+            </Link>
+            <Link 
+              href="/jobs" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-lg hover:bg-gray-800/60 text-gray-200 flex items-center gap-2"
+            >
+              <Briefcase className="w-4 h-4 text-emerald-400" />
+              <span>Placement Jobs</span>
+            </Link>
           </div>
 
           {/* Auth options in mobile menu */}
@@ -268,10 +245,10 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
                 <Link
                   href={dashboardHref}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 text-white font-bold text-xs"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-md shadow-purple-600/30"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  <span>Go to {activeRole.toUpperCase()} Dashboard</span>
+                  <span>Go to Dashboard</span>
                 </Link>
                 <button
                   onClick={() => {
@@ -289,45 +266,20 @@ export function Navbar({ currentRole, onRoleChange, isEmulatorActive = true }: N
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 rounded-xl border border-gray-800 text-center font-bold text-xs text-gray-300"
+                  className="py-2.5 rounded-xl border border-gray-800 text-center font-bold text-xs text-gray-300 hover:bg-gray-800"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/signup"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 rounded-xl bg-purple-600 text-center font-bold text-xs text-white"
+                  className="py-2.5 rounded-xl bg-purple-600 text-center font-bold text-xs text-white shadow-md shadow-purple-600/30"
                 >
                   Get Started
                 </Link>
               </div>
             )}
           </div>
-
-          {/* Role switcher in mobile menu */}
-          {onRoleChange && (
-            <div className="pt-2 border-t border-gray-800">
-              <div className="text-xs text-gray-400 mb-2">Simulate Role:</div>
-              <div className="grid grid-cols-3 gap-1 bg-[#161928] p-1 rounded-lg">
-                {(["student", "trainer", "admin"] as UserRole[]).map((role) => (
-                  <button
-                    key={role}
-                    onClick={() => {
-                      onRoleChange(role);
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`py-1.5 text-xs text-center rounded capitalize font-medium ${
-                      activeRole === role
-                        ? "bg-purple-600 text-white"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    {role}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
     </header>

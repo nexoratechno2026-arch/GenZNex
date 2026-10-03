@@ -376,8 +376,7 @@ function CourseCatalogContent() {
                 {[
                   { id: "all", label: "All Languages" },
                   { id: "English", label: "English" },
-                  { id: "Hinglish", label: "Hinglish" },
-                  { id: "Hindi", label: "Hindi" },
+                  { id: "Tamil", label: "Tamil" },
                 ].map((item) => (
                   <label key={item.id} className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer py-1">
                     <input

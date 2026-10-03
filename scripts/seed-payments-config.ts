@@ -20,7 +20,7 @@ async function seedPaymentsConfig() {
     gstRatePercent: 18,
     businessName: "GenZNex EdTech Private Limited",
     gstin: "27AABCU9603R1ZM",
-    businessAddress: "Level 4, Cyber City, Gurugram, Haryana 122002, India",
+    businessAddress: "241, East Permanur, Anna Park Backside, Salem-7, Tamil Nadu 636007, India",
     invoicePrefix: "GZN-INV-2026-",
     currentInvoiceSequence: 1000,
     refundWindowDays: 7,

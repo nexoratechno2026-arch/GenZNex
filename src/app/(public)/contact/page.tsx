@@ -95,8 +95,8 @@ export default function ContactUsPage() {
               <div className="text-xs text-gray-300 space-y-2 leading-relaxed">
                 <p><strong>Registered &amp; Corporate Headquarters:</strong></p>
                 <p className="text-gray-400">
-                  Level 4, Two Horizon Center, DLF Phase 5, Golf Course Road,<br />
-                  Sector 43, Gurugram, Haryana 122002, India.
+                  241, East Permanur, Anna Park Backside,<br />
+                  Salem - 636007, Tamil Nadu, India.
                 </p>
                 <p className="mt-3"><strong>Operational Support Window:</strong></p>
                 <p className="text-gray-400">Monday to Saturday: 09:30 AM to 06:30 PM IST</p>

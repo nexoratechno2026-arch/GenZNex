@@ -248,7 +248,7 @@ export default function AdminRevenuePage() {
 
           <div className="space-y-1">
             <span className="text-zinc-500 text-[11px]">REGISTERED ADDRESS</span>
-            <p className="text-zinc-400">{config?.businessAddress || "Level 4, Cyber City, Gurugram, Haryana"}</p>
+            <p className="text-zinc-400">{config?.businessAddress || "241, East Permanur, Anna Park Backside, Salem-7, Tamil Nadu"}</p>
           </div>
 
           <div className="space-y-1">

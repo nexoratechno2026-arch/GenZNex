@@ -55,7 +55,7 @@ export async function buildInvoicePdfBuffer(data: InvoiceGenerationData & { invo
       doc.fillColor(textColor).fontSize(10).font("Helvetica-Bold").text(data.businessName || "GenZNex EdTech Private Limited", 300, 40, { align: "right" });
       doc.font("Helvetica").fontSize(8).fillColor("#4b5563");
       doc.text(`GSTIN: ${data.gstin || "27AABCU9603R1ZM"}`, 300, 55, { align: "right" });
-      doc.text(data.businessAddress || "Level 4, Cyber City, Gurugram, Haryana 122002", 300, 68, { align: "right" });
+      doc.text(data.businessAddress || "241, East Permanur, Anna Park Backside, Salem-7, Tamil Nadu 636007", 300, 68, { align: "right" });
       doc.text("Support: payments@genznex.in | www.genznex.in", 300, 81, { align: "right" });
 
       doc.moveTo(40, 105).lineTo(555, 105).strokeColor("#e5e7eb").lineWidth(1).stroke();

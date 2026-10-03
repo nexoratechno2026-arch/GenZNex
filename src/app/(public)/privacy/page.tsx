@@ -49,7 +49,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <p className="text-sm text-gray-300 leading-relaxed">
             <strong>Corporate Identification:</strong> CIN: U80900DL2026PTC998877 | GSTIN: 07AABCU9603R1ZM<br />
-            <strong>Registered Office:</strong> Level 4, Cyber City, Gurugram, Haryana 122002, India.<br />
+            <strong>Registered Office:</strong> 241, East Permanur, Anna Park Backside, Salem-7, Tamil Nadu 636007, India.<br />
             <strong>Email:</strong> privacy@genznex.in
           </p>
         </section>
@@ -154,7 +154,7 @@ export default function PrivacyPolicyPage() {
             <p><strong>Name:</strong> Rajesh Vardhan</p>
             <p><strong>Designation:</strong> Data Protection &amp; Grievance Redressal Officer</p>
             <p><strong>Email:</strong> grievance@genznex.in</p>
-            <p><strong>Address:</strong> Level 4, DLF Cyber City, Gurugram, Haryana 122002, India</p>
+            <p><strong>Address:</strong> 241, East Permanur, Anna Park Backside, Salem-7, Tamil Nadu 636007, India</p>
             <p><strong>Turnaround SLA:</strong> Acknowledgement within 24 hours; resolution within 15 business days.</p>
           </div>
         </section>

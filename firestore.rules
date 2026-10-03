@@ -240,6 +240,7 @@ service cloud.firestore {
       allow read: if isAuthenticated() && (
         isAdmin()
         || isTrainer()
+        || (resource.data.scopeType == 'global')
         || (resource.data.scopeType == 'course' && isEnrolled(resource.data.scopeId))
         || (resource.data.scopeType == 'batch' && isEnrolledInBatch(resource.data.scopeId))
       );
@@ -250,6 +251,7 @@ service cloud.firestore {
         allow read: if isAuthenticated() && (
           isAdmin()
           || isTrainer()
+          || (get(/databases/$(database)/documents/forum_posts/$(postId)).data.scopeType == 'global')
           || (get(/databases/$(database)/documents/forum_posts/$(postId)).data.scopeType == 'course' && isEnrolled(get(/databases/$(database)/documents/forum_posts/$(postId)).data.scopeId))
           || (get(/databases/$(database)/documents/forum_posts/$(postId)).data.scopeType == 'batch' && isEnrolledInBatch(get(/databases/$(database)/documents/forum_posts/$(postId)).data.scopeId))
         );
