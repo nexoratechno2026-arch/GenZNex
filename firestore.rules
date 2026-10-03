@@ -63,8 +63,14 @@ service cloud.firestore {
     // 1. Users Collection
     match /users/{userId} {
       allow read: if true;
-      allow create: if isUser(userId) && (!request.resource.data.keys().hasAny(['role']));
-      allow update: if (isUser(userId) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'createdAt']))) || isAdmin();
+      allow create: if isUser(userId)
+        && request.resource.data.get('role', 'student') == 'student';
+      allow update: if (isUser(userId)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['createdAt']))
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])
+          || request.resource.data.get('role', '') == resource.data.get('role', '')
+        )) || isAdmin();
       allow delete: if isAdmin();
     }
 
