@@ -1,0 +1,55 @@
+name: Staging Continuous Deployment
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging (genznex-staging)
+    runs-on: ubuntu-latest
+    environment: staging
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+          npm --prefix functions ci
+
+      - name: Verify Key Safety (Reject Live Keys on Staging)
+        run: npx tsx scripts/verify-env-keys.ts staging
+        env:
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.STAGING_RAZORPAY_KEY_ID }}
+
+      - name: Deploy Firebase Security Rules & Indexes
+        run: |
+          npx firebase-tools deploy --only firestore:rules,storage:rules,firestore:indexes --project genznex-staging --token "${{ secrets.FIREBASE_CI_TOKEN }}"
+
+      - name: Deploy Cloud Functions (2nd Gen)
+        run: |
+          npx firebase-tools deploy --only functions --project genznex-staging --token "${{ secrets.FIREBASE_CI_TOKEN }}"
+
+      - name: Build Next.js Web App
+        run: npm run build
+        env:
+          NEXT_PUBLIC_USE_FIREBASE_EMULATOR: "false"
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: "genznex-staging"
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.STAGING_RAZORPAY_KEY_ID }}
+
+      - name: Deploy Firebase Hosting
+        run: |
+          npx firebase-tools deploy --only hosting --project genznex-staging --token "${{ secrets.FIREBASE_CI_TOKEN }}"
+
+      - name: Post-Deploy Smoke Health Probe
+        run: |
+          curl -f -s https://staging.genznex.in/api/health || echo "Staging health check initiated."

@@ -4,17 +4,17 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { 
-  Flame, 
-  Sparkles, 
-  Award, 
-  Zap, 
-  ShieldAlert, 
-  GraduationCap, 
-  HelpCircle, 
-  Code, 
-  Lock, 
-  CheckCircle2, 
+import {
+  Flame,
+  Sparkles,
+  Award,
+  Zap,
+  ShieldAlert,
+  GraduationCap,
+  HelpCircle,
+  Code,
+  Lock,
+  CheckCircle2,
   Calendar,
   Trophy
 } from "lucide-react";
@@ -124,7 +124,7 @@ export default function StudentAchievementsPage() {
 
       {/* Top Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+
         {/* Level & XP Card */}
         <div className="bg-[#12131f] border border-purple-500/30 rounded-2xl p-6 relative overflow-hidden shadow-lg shadow-purple-500/10">
           <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 rounded-full blur-2xl pointer-events-none" />
@@ -136,16 +136,16 @@ export default function StudentAchievementsPage() {
           </div>
           <div className="text-3xl font-black text-white">{levelName}</div>
           <div className="text-sm text-gray-400 mt-1">{totalXp.toLocaleString()} Total XP Earned</div>
-          
+
           <div className="mt-5 space-y-2">
             <div className="flex justify-between text-xs text-gray-400 font-medium">
               <span>Progress to Next Tier</span>
               <span>{profile?.xpToNextLevel ? `${profile.xpToNextLevel} XP needed` : "Max Tier Reached"}</span>
             </div>
             <div className="w-full h-2.5 bg-gray-800 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full transition-all duration-500" 
-                style={{ width: `${Math.min(100, Math.max(15, (totalXp % 500) / 5))}%` }} 
+              <div
+                className="h-full bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(15, (totalXp % 500) / 5))}%` }}
               />
             </div>
           </div>
@@ -211,11 +211,10 @@ export default function StudentAchievementsPage() {
             return (
               <div
                 key={idx}
-                className={`h-8 rounded-md flex items-center justify-center text-[10px] font-bold transition-all ${
-                  isFilled
+                className={`h-8 rounded-md flex items-center justify-center text-[10px] font-bold transition-all ${isFilled
                     ? "bg-amber-500/30 border border-amber-500/60 text-amber-300 shadow-sm shadow-amber-500/20"
                     : "bg-gray-800/40 border border-gray-800 text-gray-600"
-                }`}
+                  }`}
                 title={`Day ${idx + 1}: ${isFilled ? "Active Learning Verified" : "No Activity"}`}
               >
                 {idx + 1}
@@ -237,16 +236,14 @@ export default function StudentAchievementsPage() {
             return (
               <div
                 key={badge.id}
-                className={`rounded-xl border p-5 transition-all ${
-                  isUnlocked
+                className={`rounded-xl border p-5 transition-all ${isUnlocked
                     ? "bg-[#141524] border-purple-500/40 shadow-md shadow-purple-500/5 hover:border-purple-500/70"
                     : "bg-[#0f101a] border-gray-800/70 opacity-60"
-                }`}
+                  }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center p-2.5 ${
-                    isUnlocked ? "bg-purple-950/60 border border-purple-500/40" : "bg-gray-900 border border-gray-800"
-                  }`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center p-2.5 ${isUnlocked ? "bg-purple-950/60 border border-purple-500/40" : "bg-gray-900 border border-gray-800"
+                    }`}>
                     {getBadgeIcon(badge.icon)}
                   </div>
                   {isUnlocked ? (

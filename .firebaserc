@@ -1,5 +1,10 @@
 {
   "projects": {
-    "default": "demo-genznex"
-  }
+    "default": "demo-genznex",
+    "dev": "genznex-dev",
+    "staging": "genznex-staging",
+    "prod": "genznex-prod"
+  },
+  "targets": {},
+  "etags": {}
 }

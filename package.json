@@ -14,7 +14,11 @@
     "seed:phase5": "tsx scripts/seed-phase5.ts",
     "test:phase5": "tsx scripts/test-phase5-e2e.ts",
     "seed:phase6": "tsx scripts/seed-phase6.ts",
-    "test:phase6": "tsx scripts/test-phase6-e2e.ts"
+    "test:phase6": "tsx scripts/test-phase6-e2e.ts",
+    "seed:phase7": "tsx scripts/seed-phase7.ts",
+    "test:all": "tsx scripts/test-all.ts",
+    "verify:env": "tsx scripts/verify-env-keys.ts",
+    "scan:secrets": "tsx scripts/scan-secrets.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

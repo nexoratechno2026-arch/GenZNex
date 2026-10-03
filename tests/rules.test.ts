@@ -1,7 +1,7 @@
 import { initializeTestEnvironment, assertFails, assertSucceeds } from "@firebase/rules-unit-testing";
 import * as fs from "fs";
 import * as path from "path";
-import { setDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import { setDoc, doc, updateDoc, getDoc, deleteDoc } from "firebase/firestore";
 
 const PROJECT_ID = "demo-genznex";
 
@@ -524,7 +524,69 @@ async function runRulesTests() {
     );
     console.log("   ✅ PASS: Direct client write to /stats_daily blocked (CF-only write).");
 
-    console.log("\n🎉 ALL 42 SECURITY RULES TESTS (PHASES 1-6) PASSED SUCCESSFULLY! 100% COMPLIANT.\n");
+    // Phase 7 Hardening Tests
+    const guestDb = testEnv.unauthenticatedContext().firestore();
+
+    console.log("\n🧪 Test 43: Unauthenticated guest CANNOT write to /config/features (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(guestDb, "config", "features"), {
+        maintenanceMode: true,
+      })
+    );
+    console.log("   ✅ PASS: Guest modification of feature flags blocked.");
+
+    console.log("\n🧪 Test 44: Student CANNOT modify /config/features (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "config", "features"), {
+        maintenanceMode: true,
+      })
+    );
+    console.log("   ✅ PASS: Student modification of feature flags blocked.");
+
+    console.log("\n🧪 Test 45: Admin CAN update /config/features (Must SUCCEED)");
+    await assertSucceeds(
+      setDoc(doc(adminDb, "config", "features"), {
+        installmentsEnabled: false,
+        maintenanceMode: false,
+        updatedAt: new Date().toISOString(),
+      })
+    );
+    console.log("   ✅ PASS: Admin successfully updated feature flags config.");
+
+    console.log("\n🧪 Test 46: Student CANNOT write directly to /audit_logs (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(studentDb, "audit_logs", "fake_audit"), {
+        action: "TAMPER_LOGS",
+        userId: studentUid,
+      })
+    );
+    console.log("   ✅ PASS: Student tamper write to /audit_logs blocked.");
+
+    console.log("\n🧪 Test 47: Trainer CANNOT write directly to /invoices (Must be DENIED)");
+    await assertFails(
+      setDoc(doc(trainerDb, "invoices", "fake_inv"), {
+        invoiceNumber: "INV-HACK",
+        amountInPaise: 0,
+      })
+    );
+    console.log("   ✅ PASS: Direct client write to /invoices blocked.");
+
+    console.log("\n🧪 Test 48: Student CANNOT delete other user's review (Must be DENIED)");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), "courses", "course_fullstack_ai", "reviews", "review_other"), {
+        userId: "other_user_999",
+        courseId: "course_fullstack_ai",
+        rating: 5,
+        reviewText: "Great course",
+        createdAt: new Date().toISOString(),
+      });
+    });
+    await assertFails(
+      deleteDoc(doc(studentDb, "courses", "course_fullstack_ai", "reviews", "review_other"))
+    );
+    console.log("   ✅ PASS: Unauthorized review deletion blocked.");
+
+    console.log("\n🎉 ALL 48 SECURITY RULES TESTS (PHASES 1-7) PASSED SUCCESSFULLY! 100% COMPLIANT.\n");
   } finally {
     await testEnv.cleanup();
   }
@@ -534,3 +596,4 @@ runRulesTests().catch((err) => {
   console.error("❌ Rules Test Failed:", err);
   process.exit(1);
 });
+

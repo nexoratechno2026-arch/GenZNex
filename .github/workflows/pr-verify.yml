@@ -1,0 +1,61 @@
+name: PR Quality, Security & Rules Verification
+
+on:
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  verify:
+    name: Verify Quality, Security Rules & Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Setup Java (for Firebase Emulators)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install Project Dependencies
+        run: npm ci
+
+      - name: Install Cloud Functions Dependencies
+        run: npm --prefix functions ci
+
+      - name: Run Secret Leak Audit (Gitleaks Simulation)
+        run: npx tsx scripts/scan-secrets.ts
+
+      - name: Verify Environment Keys Integrity
+        run: npx tsx scripts/verify-env-keys.ts dev
+
+      - name: TypeScript Health Check (Next.js)
+        run: npx tsc --noEmit
+
+      - name: TypeScript Health Check (Functions)
+        run: npm --prefix functions run build
+
+      - name: Start Firebase Emulators & Run Security Rules Tests
+        run: |
+          npx firebase-tools emulators:exec --project demo-genznex --only firestore,auth "npm run test:rules"
+
+      - name: Run All Consolidated Unit & Resilience Tests
+        run: |
+          npx firebase-tools emulators:exec --project demo-genznex --only firestore,auth,functions "npm run test:all"
+
+      - name: Next.js Production Build Validation
+        run: npm run build
+        env:
+          NEXT_PUBLIC_USE_FIREBASE_EMULATOR: "true"
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: "demo-genznex"

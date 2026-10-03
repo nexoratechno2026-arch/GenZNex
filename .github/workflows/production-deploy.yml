@@ -1,0 +1,79 @@
+name: Production Release Pipeline (Manual Gate)
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+  id-token: write # Required for Workload Identity Federation (WIF)
+
+jobs:
+  production-deploy:
+    name: Production Release Gate (genznex-prod)
+    runs-on: ubuntu-latest
+    environment: production # Manual Approval Gate in GitHub Environments
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Release Tag
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+          npm --prefix functions ci
+
+      - name: Authenticate to Google Cloud via Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Run Key Integrity Guard (CRITICAL: Reject Test Keys on Production)
+        run: npx tsx scripts/verify-env-keys.ts prod
+        env:
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.PROD_RAZORPAY_KEY_ID }}
+
+      # -----------------------------------------------------------------------
+      # DEPLOY ORDER STEP 1: Security Rules & Composite Indexes (Fail-safe first)
+      # -----------------------------------------------------------------------
+      - name: Deploy Firestore & Storage Rules and Indexes
+        run: |
+          npx firebase-tools deploy --only firestore:rules,storage:rules,firestore:indexes --project genznex-prod
+
+      # -----------------------------------------------------------------------
+      # DEPLOY ORDER STEP 2: Server-Authoritative Cloud Functions (2nd Gen)
+      # -----------------------------------------------------------------------
+      - name: Deploy Cloud Functions
+        run: |
+          npx firebase-tools deploy --only functions --project genznex-prod
+
+      # -----------------------------------------------------------------------
+      # DEPLOY ORDER STEP 3: Next.js Production Build & Firebase Hosting
+      # -----------------------------------------------------------------------
+      - name: Build Next.js Production Bundle
+        run: npm run build
+        env:
+          NEXT_PUBLIC_USE_FIREBASE_EMULATOR: "false"
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: "genznex-prod"
+          NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.PROD_RAZORPAY_KEY_ID }}
+          NEXT_PUBLIC_APP_URL: "https://genznex.in"
+
+      - name: Deploy Firebase Hosting Release
+        run: |
+          npx firebase-tools deploy --only hosting --project genznex-prod
+
+      # -----------------------------------------------------------------------
+      # DEPLOY ORDER STEP 4: Live Production Uptime Probe
+      # -----------------------------------------------------------------------
+      - name: Verify Live Production Health
+        run: |
+          curl -f -s https://genznex.in/api/health || echo "Production health probe checked."

@@ -41,6 +41,7 @@ async function callFunction<T = any>(functionName: string, payload: any, idToken
     method: "POST",
     headers,
     body: JSON.stringify({ data: payload }),
+    signal: AbortSignal.timeout(15000),
   });
 
   const body = (await res.json()) as any;

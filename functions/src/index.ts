@@ -1994,3 +1994,11 @@ export const revokeCertificate = onCall(async (request) => {
   return { success: true, certificateId, status: "revoked" };
 });
 
+// Phase 7: Compliance, DPDP User Data Rights & Health Checks
+export {
+  healthCheck,
+  exportUserData,
+  deleteUserData,
+  getActiveFeatureFlags,
+} from "./compliance";
+

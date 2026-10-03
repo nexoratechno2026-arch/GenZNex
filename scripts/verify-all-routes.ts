@@ -58,6 +58,17 @@ const routesToTest: RouteCheck[] = [
   { path: "/settings/notifications", name: "Notification Preferences & Quiet Hours", phase: "Phase 6" },
   { path: "/admin/analytics", name: "Admin Master KPI & Revenue Analytics", phase: "Phase 6" },
   { path: "/trainer/analytics", name: "Trainer Cohort Drop-off Analytics", phase: "Phase 6" },
+
+  // Phase 7: Testing, Compliance, Razorpay Mandates & System Health
+  { path: "/privacy", name: "DPDP Act Privacy Policy", phase: "Phase 7" },
+  { path: "/terms", name: "Terms of Service Agreement", phase: "Phase 7" },
+  { path: "/refunds", name: "7-Day Refund & Cancellation Policy", phase: "Phase 7" },
+  { path: "/cookies", name: "Cookie & Telemetry Policy", phase: "Phase 7" },
+  { path: "/accessibility", name: "WCAG 2.1 AA Accessibility Statement", phase: "Phase 7" },
+  { path: "/contact", name: "Razorpay Registered Business Contact", phase: "Phase 7" },
+  { path: "/offline", name: "PWA Offline Fallback Screen", phase: "Phase 7" },
+  { path: "/api/health", name: "System Health & Uptime Probe (JSON)", phase: "Phase 7" },
+  { path: "/settings/account", name: "Account Data Rights & Erasure", phase: "Phase 7" },
 ];
 
 async function verifyAllRoutes() {

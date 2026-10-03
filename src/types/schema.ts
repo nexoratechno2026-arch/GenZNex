@@ -1347,4 +1347,17 @@ export interface TrackEventParams {
   params?: Record<string, unknown>;
 }
 
+// --- 5. Phase 7: Dynamic Feature Flags Configuration (/config/features) ---
+export interface FeatureFlagsDoc {
+  installmentsEnabled: boolean;
+  smsStubEnabled: boolean;
+  whatsappStubEnabled: boolean;
+  publicShowcaseEnabled: boolean;
+  maintenanceMode: boolean;
+  maintenanceNotice?: string;
+  appCheckEnforced: boolean;
+  updatedAt: unknown;
+  updatedBy?: string;
+}
+
 
