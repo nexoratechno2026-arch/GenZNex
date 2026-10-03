@@ -69,25 +69,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    let unsubProfile: (() => void) | null = null;
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (unsubProfile) {
+        unsubProfile();
+        unsubProfile = null;
+      }
+
       setUser(currentUser);
       if (currentUser) {
         await resolveRole(currentUser);
 
         // Listen to Firestore profile updates
         const userRef = doc(db, "users", currentUser.uid);
-        const unsubProfile = onSnapshot(userRef, (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.data() as UserDoc;
-            setUserProfile(data);
-            if (data.role) {
-              setRole(data.role);
+        unsubProfile = onSnapshot(
+          userRef,
+          (snapshot) => {
+            if (snapshot.exists()) {
+              const data = snapshot.data() as UserDoc;
+              setUserProfile(data);
+              if (data.role) {
+                setRole(data.role);
+              }
             }
+          },
+          (err) => {
+            console.warn("User profile listener update:", err.message);
           }
-        });
+        );
 
         setLoading(false);
-        return () => unsubProfile();
       } else {
         setUserProfile(null);
         setRole("student");
@@ -95,7 +107,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubProfile) {
+        unsubProfile();
+      }
+      unsubscribe();
+    };
   }, []);
 
   return (

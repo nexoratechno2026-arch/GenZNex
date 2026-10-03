@@ -62,7 +62,7 @@ service cloud.firestore {
 
     // 1. Users Collection
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow create: if isUser(userId) && (!request.resource.data.keys().hasAny(['role']));
       allow update: if (isUser(userId) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'createdAt']))) || isAdmin();
       allow delete: if isAdmin();
