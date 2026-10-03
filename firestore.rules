@@ -13,7 +13,7 @@ service cloud.firestore {
     }
 
     function hasRole(role) {
-      return isAuthenticated() && request.auth.token.role == role;
+      return isAuthenticated() && request.auth.token.get('role', '') == role;
     }
 
     function isAdmin() {
@@ -29,7 +29,7 @@ service cloud.firestore {
     }
 
     function isPlacementOfficer() {
-      return isAuthenticated() && request.auth.token.role == 'placement';
+      return isAuthenticated() && request.auth.token.get('role', '') == 'placement';
     }
 
     function isAdminOrPlacement() {
@@ -37,23 +37,27 @@ service cloud.firestore {
     }
 
     function isCourseOwner(data) {
-      return ('instructor' in data && data.instructor.uid == request.auth.uid)
-        || ('trainerId' in data && data.trainerId == request.auth.uid);
+      return data != null && (
+        ('instructor' in data && data.instructor != null && data.instructor.get('uid', '') == request.auth.uid)
+        || data.get('trainerId', '') == request.auth.uid
+      );
     }
 
     function isCoursePublished(data) {
-      return ('status' in data && data.status == 'published') || ('isPublished' in data && data.isPublished == true);
+      return data != null && (
+        ('status' in data && data.status == 'published') || ('isPublished' in data && data.isPublished == true)
+      );
     }
 
     function isEnrolled(courseId) {
       return isAuthenticated() && exists(/databases/$(database)/documents/enrollments/$(request.auth.uid + '_' + courseId))
-        && get(/databases/$(database)/documents/enrollments/$(request.auth.uid + '_' + courseId)).data.status == 'active';
+        && get(/databases/$(database)/documents/enrollments/$(request.auth.uid + '_' + courseId)).data.get('status', '') == 'active';
     }
 
     function isEnrolledInBatch(batchId) {
       return isAuthenticated()
         && exists(/databases/$(database)/documents/batch_enrollments/$(batchId + '_' + request.auth.uid))
-        && get(/databases/$(database)/documents/batch_enrollments/$(batchId + '_' + request.auth.uid)).data.status == 'active';
+        && get(/databases/$(database)/documents/batch_enrollments/$(batchId + '_' + request.auth.uid)).data.get('status', '') == 'active';
     }
 
     // 1. Users Collection
@@ -66,7 +70,8 @@ service cloud.firestore {
 
     // 2. Courses Collection & Subcollections
     match /courses/{courseId} {
-      allow get: if isCoursePublished(resource.data)
+      allow get: if resource == null
+        || isCoursePublished(resource.data)
         || isEnrolled(courseId)
         || isAdmin()
         || (isTrainer() && isCourseOwner(resource.data));
@@ -88,10 +93,13 @@ service cloud.firestore {
         allow write: if isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
 
         match /lessons/{lessonId} {
-          allow read: if resource.data.isPreview == true
+          allow get: if resource == null
+            || resource.data.get('isPreview', false) == true
             || isEnrolled(courseId)
             || isAdmin()
             || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+
+          allow list: if true;
 
           allow write: if isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
         }
@@ -127,24 +135,25 @@ service cloud.firestore {
     // 3. Enrollments (No direct client write)
     match /enrollments/{enrollmentId} {
       allow read: if isAdmin()
-        || (isAuthenticated() && resource.data.userId == request.auth.uid)
-        || (isTrainer() && resource.data.trainerId == request.auth.uid);
+        || resource == null
+        || (isAuthenticated() && resource.data.get('userId', '') == request.auth.uid)
+        || (isTrainer() && resource.data.get('trainerId', '') == request.auth.uid);
       allow write: if false;
 
       match /lesson_progress/{lessonId} {
         allow read: if isAdmin()
-          || (isAuthenticated() && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid)
+          || (isAuthenticated() && exists(/databases/$(database)/documents/enrollments/$(enrollmentId)) && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.get('userId', '') == request.auth.uid)
           || isTrainer();
-        allow create, update: if isAuthenticated() && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid;
+        allow create, update: if isAuthenticated() && exists(/databases/$(database)/documents/enrollments/$(enrollmentId)) && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.get('userId', '') == request.auth.uid;
         allow delete: if isAdmin();
       }
 
       match /notes/{noteId} {
-        allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid;
+        allow read, write: if isAuthenticated() && exists(/databases/$(database)/documents/enrollments/$(enrollmentId)) && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.get('userId', '') == request.auth.uid;
       }
 
       match /bookmarks/{lessonId} {
-        allow read, write: if isAuthenticated() && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.userId == request.auth.uid;
+        allow read, write: if isAuthenticated() && exists(/databases/$(database)/documents/enrollments/$(enrollmentId)) && get(/databases/$(database)/documents/enrollments/$(enrollmentId)).data.get('userId', '') == request.auth.uid;
       }
     }
 

@@ -116,7 +116,7 @@ const ValidateCouponSchema = z.object({
 
 const CreateOrderSchema = z.object({
   courseId: z.string().min(1, "Course ID is required"),
-  couponCode: z.string().optional(),
+  couponCode: z.string().nullable().optional(),
 });
 
 const VerifyPaymentSchema = z.object({

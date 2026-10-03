@@ -103,14 +103,20 @@ export default function CheckoutPage() {
     const db = getFirebaseFirestore();
     const enrollmentRef = doc(db, "enrollments", `${user.uid}_${course.id}`);
 
-    const unsubscribe = onSnapshot(enrollmentRef, (snap) => {
-      if (snap.exists() && snap.data()?.status === "active") {
-        setProcessingStatus("Enrollment Confirmed! Redirecting to course...");
-        setTimeout(() => {
-          router.push(`/checkout/success?courseId=${course.id}&slug=${course.slug}`);
-        }, 1200);
+    const unsubscribe = onSnapshot(
+      enrollmentRef,
+      (snap) => {
+        if (snap.exists() && snap.data()?.status === "active") {
+          setProcessingStatus("Enrollment Confirmed! Redirecting to course...");
+          setTimeout(() => {
+            router.push(`/checkout/success?courseId=${course.id}&slug=${course.slug}`);
+          }, 1200);
+        }
+      },
+      (error) => {
+        console.warn("Enrollment listener update:", error.message);
       }
-    });
+    );
 
     return () => unsubscribe();
   }, [user, course, router]);

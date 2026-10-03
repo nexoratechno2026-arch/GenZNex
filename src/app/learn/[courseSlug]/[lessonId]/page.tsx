@@ -240,12 +240,18 @@ export default function LearningPlayerPage() {
     const notesRef = collection(db, "enrollments", `${user.uid}_${course.id}`, "notes");
     const q = query(notesRef, where("lessonId", "==", lessonId));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const loaded: LessonNoteDoc[] = [];
-      snapshot.forEach((d) => loaded.push({ id: d.id, ...d.data() } as LessonNoteDoc));
-      loaded.sort((a, b) => a.timestampSeconds - b.timestampSeconds);
-      setNotes(loaded);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const loaded: LessonNoteDoc[] = [];
+        snapshot.forEach((d) => loaded.push({ id: d.id, ...d.data() } as LessonNoteDoc));
+        loaded.sort((a, b) => a.timestampSeconds - b.timestampSeconds);
+        setNotes(loaded);
+      },
+      (err) => {
+        console.warn("Notes onSnapshot notice:", err.message);
+      }
+    );
 
     return () => unsubscribe();
   }, [user, course, lessonId]);
