@@ -9,7 +9,7 @@ export default function TrainerLayout({ children }: { children: React.ReactNode 
   const { role } = useAuth();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#090a0f]">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white">
       <Navbar currentRole={role} isEmulatorActive={true} />
       <div className="flex-1 flex flex-col md:flex-row max-w-7xl w-full mx-auto">
         <Sidebar role="trainer" />

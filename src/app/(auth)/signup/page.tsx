@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, Mail, Lock, User, Phone, AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
@@ -72,29 +72,25 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-grid-pattern relative">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-cyan-600/15 blur-[120px] pointer-events-none -z-10" />
-
-      <Card className="w-full max-w-md border-gray-800 shadow-2xl">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-black text-black dark:text-white relative">
+      <Card className="w-full max-w-md border-neutral-300 dark:border-neutral-800 shadow-lg">
         <CardHeader className="text-center pb-2">
           <Link href="/" className="inline-flex items-center gap-2 justify-center mx-auto mb-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-400 p-[1.5px]">
-              <div className="w-full h-full bg-[#0d0e17] rounded-[9px] flex items-center justify-center">
-                <Zap className="w-4 h-4 text-cyan-400" />
-              </div>
+            <div className="w-9 h-9 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold">
+              <GoogleIcon name="bolt" size={20} filled />
             </div>
-            <span className="font-extrabold text-xl tracking-tight text-white">GenZNex</span>
+            <span className="font-bold text-xl tracking-tight text-black dark:text-white">GenZNex</span>
           </Link>
-          <CardTitle>Create Your Account</CardTitle>
+          <CardTitle>Create an Account</CardTitle>
           <CardDescription>
-            Join India&apos;s next-gen tech community and unlock real-world bootcamps.
+            Join India&apos;s Next-Gen Tech Academy &amp; start learning today.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="p-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white text-xs flex items-center gap-2">
+              <GoogleIcon name="error" size={16} className="shrink-0" />
               <span>{error}</span>
             </div>
           )}
@@ -104,10 +100,10 @@ export default function SignupPage() {
               id="signup-name-input"
               label="Full Name"
               type="text"
-              placeholder="Aarav Sharma"
+              placeholder="Rahul Sharma"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              leftIcon={<User className="w-4 h-4" />}
+              leftIcon={<GoogleIcon name="person" size={18} />}
               required
             />
 
@@ -115,10 +111,10 @@ export default function SignupPage() {
               id="signup-email-input"
               label="Email Address"
               type="email"
-              placeholder="aarav@example.com"
+              placeholder="rahul@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              leftIcon={<Mail className="w-4 h-4" />}
+              leftIcon={<GoogleIcon name="mail" size={18} />}
               required
             />
 
@@ -126,10 +122,10 @@ export default function SignupPage() {
               id="signup-password-input"
               label="Password"
               type="password"
-              placeholder="•••••••• (Min 6 characters)"
+              placeholder="At least 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              leftIcon={<Lock className="w-4 h-4" />}
+              leftIcon={<GoogleIcon name="lock" size={18} />}
               required
             />
 
@@ -137,10 +133,10 @@ export default function SignupPage() {
               id="signup-confirm-password-input"
               label="Confirm Password"
               type="password"
-              placeholder="••••••••"
+              placeholder="Re-enter password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              leftIcon={<CheckCircle2 className="w-4 h-4" />}
+              leftIcon={<GoogleIcon name="lock" size={18} />}
               required
             />
 
@@ -150,19 +146,21 @@ export default function SignupPage() {
               variant="primary"
               fullWidth
               loading={loading}
-              rightIcon={<ArrowRight className="w-4 h-4" />}
+              rightIcon={<GoogleIcon name="arrow_forward" size={18} />}
+              className="mt-2"
             >
-              Sign Up Free
+              Create Account
             </Button>
           </form>
 
+          {/* Social Sign Up Divider */}
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-800" />
+              <div className="w-full border-t border-neutral-200 dark:border-neutral-800" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#12141e] px-2 text-gray-400 font-semibold">
-                Or join with
+              <span className="bg-white dark:bg-black px-2 text-neutral-500 font-bold">
+                Or sign up with
               </span>
             </div>
           </div>
@@ -171,7 +169,7 @@ export default function SignupPage() {
             <Button
               id="google-signup-btn"
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
               loading={googleLoading}
               onClick={handleGoogleSignup}
@@ -183,9 +181,9 @@ export default function SignupPage() {
             <Button
               id="phone-otp-signup-btn"
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
-              leftIcon={<Phone className="w-3.5 h-3.5 text-cyan-400" />}
+              leftIcon={<GoogleIcon name="phone" size={16} />}
               onClick={() => setPhoneModalOpen(true)}
               className="text-xs"
             >
@@ -193,14 +191,14 @@ export default function SignupPage() {
             </Button>
           </div>
 
-          <div className="pt-2 text-center text-xs text-gray-400">
+          <div className="pt-2 text-center text-xs text-neutral-600 dark:text-neutral-400">
             Already have an account?{" "}
             <Link
               href="/login"
               id="login-link"
-              className="text-purple-400 hover:text-purple-300 font-bold"
+              className="text-black dark:text-white font-bold underline underline-offset-2"
             >
-              Sign In
+              Sign in
             </Link>
           </div>
         </CardContent>

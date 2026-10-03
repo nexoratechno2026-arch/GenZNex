@@ -3,37 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  BookOpen, 
-  Users, 
-  CalendarCheck, 
-  FolderGit2, 
-  Briefcase, 
-  LayoutDashboard, 
-  GraduationCap, 
-  Layers, 
-  ShieldCheck, 
-  Sliders, 
-  LogOut,
-  ChevronRight,
-  Zap,
-  CreditCard,
-  Tag,
-  TrendingUp,
-  Mic,
-  FileText,
-  Calendar,
-  Rocket,
-  Code2,
-  Building2,
-  Trophy,
-  Flame,
-  Award,
-  MessageSquare,
-  Bell,
-  BarChart3,
-  Settings,
-} from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import type { UserRole } from "@/types/schema";
 import { useAuth } from "@/lib/context/AuthContext";
 
@@ -46,58 +16,39 @@ export function Sidebar({ role }: SidebarProps) {
   const { logout, userProfile, user } = useAuth();
 
   const studentNavItems = [
-    { label: "Overview", href: "/student", icon: LayoutDashboard },
-    { label: "My Courses", href: "/student/courses", icon: BookOpen },
-    // --- Phase 6: Gamification & Community ---
-    { label: "Achievements & XP", href: "/student/achievements", icon: Flame },
-    { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
-    { label: "Doubt Clearing Forum", href: "/forum", icon: MessageSquare },
-    { label: "Notifications", href: "/notifications", icon: Bell },
-    // --- Phase 5: Training Module ---
-    { label: "My Training", href: "/student/training", icon: Rocket },
-    { label: "Live Schedule", href: "/student/schedule", icon: Calendar },
-    { label: "Projects", href: "/student/projects", icon: Code2 },
-    { label: "Mock Interviews", href: "/student/interviews", icon: Mic },
-    { label: "Resume & Placement", href: "/student/placement/resume", icon: FileText },
-    { label: "Job Board", href: "/jobs", icon: Briefcase },
-    // --- Core ---
-    { label: "My Certificates", href: "/student/certificates", icon: GraduationCap },
-    { label: "Payments & Invoices", href: "/student/payments", icon: CreditCard },
+    { label: "Overview", href: "/student", icon: "dashboard" },
+    { label: "My Courses", href: "/student/courses", icon: "school" },
+    { label: "Certificates", href: "/student/certificates", icon: "workspace_premium" },
+    { label: "Achievements & XP", href: "/student/achievements", icon: "stars" },
+    { label: "Leaderboard", href: "/leaderboard", icon: "leaderboard" },
+    { label: "Doubts Forum", href: "/forum", icon: "forum" },
+    { label: "Notifications", href: "/notifications", icon: "notifications" },
+    { label: "My Training", href: "/student/training", icon: "rocket_launch" },
+    { label: "Live Schedule", href: "/student/schedule", icon: "calendar_today" },
+    { label: "Mock Interviews", href: "/student/interviews", icon: "mic" },
+    { label: "Placement Desk", href: "/jobs", icon: "work" },
   ];
 
   const trainerNavItems = [
-    { label: "Overview", href: "/trainer", icon: LayoutDashboard },
-    { label: "Course Studio", href: "/trainer/courses", icon: BookOpen },
-    // --- Phase 6: Analytics & Forum ---
-    { label: "Cohort Analytics", href: "/trainer/analytics", icon: BarChart3 },
-    { label: "Doubts & Forum", href: "/forum", icon: MessageSquare },
-    { label: "Notifications", href: "/notifications", icon: Bell },
-    // --- Phase 5: Training Module ---
-    { label: "My Batches", href: "/trainer/batches", icon: Users },
-    { label: "Mark Attendance", href: "/trainer/attendance", icon: CalendarCheck },
-    { label: "Projects & Grading", href: "/trainer/projects", icon: Code2 },
-    { label: "Interviews", href: "/trainer/interviews", icon: Mic },
-    { label: "Student Submissions", href: "/trainer/submissions", icon: FolderGit2 },
+    { label: "Trainer Studio", href: "/trainer", icon: "dashboard" },
+    { label: "Course Wizard", href: "/trainer/courses/new", icon: "add_circle" },
+    { label: "Assignment Grading", href: "/trainer/grading", icon: "assignment" },
+    { label: "Cohort Batches", href: "/trainer/batches", icon: "groups" },
+    { label: "Live Sessions", href: "/trainer/sessions", icon: "video_camera_front" },
+    { label: "Student Projects", href: "/trainer/projects", icon: "folder" },
+    { label: "Doubts Forum", href: "/forum", icon: "forum" },
   ];
 
   const adminNavItems = [
-    { label: "Overview", href: "/admin", icon: LayoutDashboard },
-    // --- Phase 6: Analytics & Community ---
-    { label: "Platform Analytics", href: "/admin/analytics", icon: BarChart3 },
-    { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
-    { label: "Community Forum", href: "/forum", icon: MessageSquare },
-    { label: "Notifications", href: "/notifications", icon: Bell },
-    // --- Phase 5 & Core ---
-    { label: "Course Approvals", href: "/admin/courses", icon: Layers },
-    { label: "Training Programs", href: "/admin/programs", icon: Rocket },
-    { label: "All Batches", href: "/admin/batches", icon: Users },
-    { label: "Job Board Admin", href: "/admin/jobs", icon: Building2 },
-    { label: "Payments & Orders", href: "/admin/payments", icon: CreditCard },
-    { label: "Coupons", href: "/admin/coupons", icon: Tag },
-    { label: "Revenue & Taxes", href: "/admin/revenue", icon: TrendingUp },
-    { label: "User Management", href: "/admin/users", icon: Users },
-    { label: "Security & Rules", href: "/admin/security", icon: ShieldCheck },
-    { label: "System Config", href: "/admin/settings", icon: Sliders },
+    { label: "Executive Dashboard", href: "/admin", icon: "dashboard" },
+    { label: "Course Approvals", href: "/admin/approvals", icon: "verified" },
+    { label: "Cohort Batches", href: "/admin/training", icon: "groups" },
+    { label: "Revenue & Ledger", href: "/admin/revenue", icon: "payments" },
+    { label: "Discount Coupons", href: "/admin/coupons", icon: "sell" },
+    { label: "Placement Pipeline", href: "/admin/placement", icon: "work" },
+    { label: "Platform Analytics", href: "/admin/analytics", icon: "analytics" },
+    { label: "Feature Flags", href: "/admin/features", icon: "toggle_on" },
+    { label: "System Health", href: "/admin/health", icon: "monitor_heart" },
   ];
 
   const navItems =
@@ -107,33 +58,21 @@ export function Sidebar({ role }: SidebarProps) {
       ? trainerNavItems
       : studentNavItems;
 
-  const roleBadgeStyles = {
-    student: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
-    trainer: "bg-purple-500/15 text-purple-300 border-purple-500/30",
-    admin: "bg-rose-500/15 text-rose-300 border-rose-500/30",
-  };
-
   return (
-    <aside className="w-64 shrink-0 glass-panel border-r border-gray-800/80 min-h-[calc(100vh-4rem)] flex flex-col justify-between p-4">
+    <aside className="w-full md:w-64 border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-4 flex flex-col justify-between shrink-0">
       <div className="space-y-6">
         
         {/* User Card */}
-        <div className="p-3 rounded-xl bg-[#121422] border border-gray-800 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-500 p-[1px] flex items-center justify-center shrink-0">
-            <div className="w-full h-full bg-[#0d0e17] rounded-[11px] flex items-center justify-center text-sm font-bold text-white">
-              {(userProfile?.displayName || user?.email || "U")[0]?.toUpperCase()}
-            </div>
+        <div className="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-md bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold text-sm shrink-0">
+            {(userProfile?.displayName || user?.email || "U")[0]?.toUpperCase()}
           </div>
           <div className="overflow-hidden">
-            <div className="text-xs font-bold text-white truncate">
-              {userProfile?.displayName || user?.displayName || "GenZNex Learner"}
+            <div className="text-xs font-bold text-black dark:text-white truncate">
+              {userProfile?.displayName || user?.displayName || user?.email?.split("@")[0] || "Learner"}
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span
-                className={`text-[10px] font-mono px-2 py-0.5 rounded-full border uppercase font-bold tracking-wider ${
-                  roleBadgeStyles[role]
-                }`}
-              >
+              <span className="text-[10px] font-bold px-2 py-0.2 rounded uppercase tracking-wider bg-black text-white dark:bg-white dark:text-black">
                 {role}
               </span>
             </div>
@@ -142,34 +81,29 @@ export function Sidebar({ role }: SidebarProps) {
 
         {/* Navigation Section */}
         <nav className="space-y-1">
-          <div className="text-[11px] font-extrabold uppercase tracking-widest text-gray-400 px-3 mb-2 flex items-center gap-1">
-            <GraduationCap className="w-3.5 h-3.5 text-purple-400" />
+          <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 px-3 mb-2 flex items-center gap-1">
+            <GoogleIcon name="menu" size={14} />
             <span>Dashboard Menu</span>
           </div>
 
           {navItems.map((item) => {
-            const Icon = item.icon;
             const isActive = pathname === item.href;
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+                className={`flex items-center justify-between px-3 py-2 rounded-md text-xs font-bold transition-all ${
                   isActive
-                    ? "bg-purple-600 text-white shadow-md shadow-purple-600/30 font-bold"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    ? "bg-black text-white dark:bg-white dark:text-black shadow-sm"
+                    : "text-neutral-700 hover:text-black hover:bg-neutral-100 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-900"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Icon
-                    className={`w-4 h-4 transition-colors ${
-                      isActive ? "text-white" : "text-gray-400 group-hover:text-purple-400"
-                    }`}
-                  />
+                  <GoogleIcon name={item.icon} size={18} />
                   <span>{item.label}</span>
                 </div>
-                {isActive && <ChevronRight className="w-3.5 h-3.5 text-white" />}
+                {isActive && <GoogleIcon name="chevron_right" size={16} />}
               </Link>
             );
           })}
@@ -177,19 +111,19 @@ export function Sidebar({ role }: SidebarProps) {
       </div>
 
       {/* Bottom Footer Actions */}
-      <div className="pt-4 border-t border-gray-800/80 space-y-2">
+      <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800 space-y-1">
         <Link
           href="/"
-          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
         >
-          <Zap className="w-4 h-4 text-cyan-400" />
-          <span>Back to Landing Page</span>
+          <GoogleIcon name="home" size={16} />
+          <span>Home Page</span>
         </Link>
         <button
           onClick={() => logout()}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-rose-400 hover:bg-rose-500/10 transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors cursor-pointer"
         >
-          <LogOut className="w-4 h-4" />
+          <GoogleIcon name="logout" size={16} />
           <span>Sign Out</span>
         </button>
       </div>

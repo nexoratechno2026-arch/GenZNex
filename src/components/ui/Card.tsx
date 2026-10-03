@@ -9,19 +9,11 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function Card({ glow = "none", className, children, ...props }: CardProps) {
-  const glowStyles = {
-    none: "",
-    purple: "hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/15",
-    cyan: "hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/15",
-    emerald: "hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/15",
-  };
-
   return (
     <div
       className={twMerge(
         clsx(
-          "glass-card rounded-2xl overflow-hidden transition-all duration-200 border border-gray-800",
-          glowStyles[glow],
+          "rounded-xl overflow-hidden transition-all duration-150 border border-neutral-300 dark:border-neutral-800 bg-white text-black dark:bg-black dark:text-white shadow-sm",
           className
         )
       )}
@@ -52,7 +44,7 @@ export function CardTitle({
   return (
     <h3
       className={twMerge(
-        clsx("text-lg sm:text-xl font-bold text-white tracking-tight", className)
+        clsx("text-lg sm:text-xl font-bold text-black dark:text-white tracking-tight", className)
       )}
       {...props}
     >
@@ -68,7 +60,7 @@ export function CardDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={twMerge(clsx("text-xs sm:text-sm text-gray-400 mt-1", className))}
+      className={twMerge(clsx("text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1", className))}
       {...props}
     >
       {children}
@@ -96,7 +88,7 @@ export function CardFooter({
   return (
     <div
       className={twMerge(
-        clsx("p-6 pt-0 border-t border-gray-800/60 mt-4", className)
+        clsx("p-6 pt-0 border-t border-neutral-200 dark:border-neutral-800 mt-4", className)
       )}
       {...props}
     >

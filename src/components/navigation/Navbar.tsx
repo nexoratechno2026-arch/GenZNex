@@ -137,7 +137,7 @@ export function Navbar({ currentRole }: NavbarProps) {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/auth/login">
+              <Link href="/login">
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -146,7 +146,7 @@ export function Navbar({ currentRole }: NavbarProps) {
                   Sign In
                 </Button>
               </Link>
-              <Link href="/auth/register">
+              <Link href="/signup">
                 <Button 
                   size="sm" 
                   variant="primary"

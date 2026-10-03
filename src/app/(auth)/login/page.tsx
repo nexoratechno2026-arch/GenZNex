@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, Mail, Lock, Phone, AlertCircle, ArrowRight } from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
@@ -59,30 +59,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-grid-pattern relative">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-purple-600/15 blur-[120px] pointer-events-none -z-10" />
-
-      <Card className="w-full max-w-md border-gray-800 shadow-2xl">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-black text-black dark:text-white relative">
+      <Card className="w-full max-w-md border-neutral-300 dark:border-neutral-800 shadow-lg">
         <CardHeader className="text-center pb-2">
           <Link href="/" className="inline-flex items-center gap-2 justify-center mx-auto mb-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-400 p-[1.5px]">
-              <div className="w-full h-full bg-[#0d0e17] rounded-[9px] flex items-center justify-center">
-                <Zap className="w-4 h-4 text-cyan-400" />
-              </div>
+            <div className="w-9 h-9 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold">
+              <GoogleIcon name="bolt" size={20} filled />
             </div>
-            <span className="font-extrabold text-xl tracking-tight text-white">GenZNex</span>
+            <span className="font-bold text-xl tracking-tight text-black dark:text-white">GenZNex</span>
           </Link>
           <CardTitle>Welcome Back</CardTitle>
           <CardDescription>
-            Sign in to access your bootcamps, courses, and placements.
+            Sign in to access your bootcamps, courses, and certificates.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="p-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white text-xs flex items-center gap-2">
+              <GoogleIcon name="error" size={16} className="shrink-0" />
               <span>{error}</span>
             </div>
           )}
@@ -95,7 +90,7 @@ export default function LoginPage() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              leftIcon={<Mail className="w-4 h-4" />}
+              leftIcon={<GoogleIcon name="mail" size={18} />}
               required
             />
 
@@ -103,13 +98,13 @@ export default function LoginPage() {
               <div className="flex justify-between items-center mb-1">
                 <label
                   htmlFor="login-password-input"
-                  className="block text-xs font-semibold text-gray-300 uppercase tracking-wider"
+                  className="block text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider"
                 >
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                  className="text-xs text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -120,7 +115,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                leftIcon={<Lock className="w-4 h-4" />}
+                leftIcon={<GoogleIcon name="lock" size={18} />}
                 required
               />
             </div>
@@ -131,7 +126,7 @@ export default function LoginPage() {
               variant="primary"
               fullWidth
               loading={loading}
-              rightIcon={<ArrowRight className="w-4 h-4" />}
+              rightIcon={<GoogleIcon name="arrow_forward" size={18} />}
             >
               Sign In
             </Button>
@@ -140,10 +135,10 @@ export default function LoginPage() {
           {/* Social Sign In Divider */}
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-800" />
+              <div className="w-full border-t border-neutral-200 dark:border-neutral-800" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#12141e] px-2 text-gray-400 font-semibold">
+              <span className="bg-white dark:bg-black px-2 text-neutral-500 font-bold">
                 Or continue with
               </span>
             </div>
@@ -153,7 +148,7 @@ export default function LoginPage() {
             <Button
               id="google-login-btn"
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
               loading={googleLoading}
               onClick={handleGoogleLogin}
@@ -165,9 +160,9 @@ export default function LoginPage() {
             <Button
               id="phone-otp-login-btn"
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
-              leftIcon={<Phone className="w-3.5 h-3.5 text-cyan-400" />}
+              leftIcon={<GoogleIcon name="phone" size={16} />}
               onClick={() => setPhoneModalOpen(true)}
               className="text-xs"
             >
@@ -175,12 +170,12 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          <div className="pt-2 text-center text-xs text-gray-400">
+          <div className="pt-2 text-center text-xs text-neutral-600 dark:text-neutral-400">
             Don&apos;t have an account?{" "}
             <Link
               href="/signup"
               id="signup-link"
-              className="text-purple-400 hover:text-purple-300 font-bold"
+              className="text-black dark:text-white font-bold underline underline-offset-2"
             >
               Create an account
             </Link>

@@ -190,7 +190,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col">
+      <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-16 w-full animate-pulse space-y-6">
           <div className="h-6 w-32 bg-zinc-800 rounded-full" />
@@ -208,7 +208,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
   if (!course) {
     return (
-      <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col">
+      <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-24 text-center flex-1 flex flex-col items-center justify-center">
           <h1 className="text-2xl font-bold text-white">Course Not Found</h1>
@@ -252,7 +252,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col">
+    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col">
       {/* Structured Data Script */}
       <script
         type="application/ld+json"
@@ -262,7 +262,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       <Navbar />
 
       {/* Hero Section */}
-      <header className="relative border-b border-zinc-800/80 bg-gradient-to-b from-purple-950/20 via-zinc-950/70 to-[#090a0f] pt-10 pb-12">
+      <header className="relative border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black pt-10 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {/* Left Column: Course Main Details */}
