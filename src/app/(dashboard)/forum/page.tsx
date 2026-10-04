@@ -20,6 +20,8 @@ import {
   UserCheck
 } from "lucide-react";
 import type { ForumPostDoc, ForumReplyDoc } from "@/types/schema";
+import { Navbar } from "@/components/navigation/Navbar";
+import { Footer } from "@/components/navigation/Footer";
 
 export default function ForumPage() {
   const { user, role } = useAuth();
@@ -276,304 +278,309 @@ export default function ForumPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 p-4 sm:p-6 lg:p-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-white flex items-center gap-3">
-            <MessageSquare className="w-8 h-8 text-purple-400" />
-            Doubt Clearing &amp; Discussion Forum
-          </h1>
-          <p className="text-gray-400 mt-1">
-            Enrolled course and cohort doubts answered by peers and industry trainers.
-          </p>
-        </div>
+    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col transition-colors">
+      <Navbar />
 
-        <button
-          onClick={() => setShowNewPostModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-600/30 transition-all self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          Ask a Doubt
-        </button>
-      </div>
-
-      {/* Main Layout: Split list & thread viewer */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* Left Column: Posts List */}
-        <div className="lg:col-span-5 space-y-4">
-          {/* Search Input */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search doubts by title or tag..."
-              className="w-full bg-[#12131f] border border-gray-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
-            />
+      <main className="flex-1 max-w-7xl w-full mx-auto space-y-6 p-4 sm:p-6 lg:p-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white flex items-center gap-3">
+              <MessageSquare className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+              Doubt Clearing &amp; Discussion Forum
+            </h1>
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-1">
+              Enrolled course and cohort doubts answered by peers and industry trainers.
+            </p>
           </div>
 
-          {loading ? (
-            <div className="p-8 text-center text-gray-400">Loading discussions...</div>
-          ) : filteredPosts.length === 0 ? (
-            <div className="p-8 text-center bg-[#12131f] border border-gray-800 rounded-xl text-gray-400 text-sm">
-              No matching doubts found.
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {filteredPosts.map((post) => {
-                const isSelected = selectedPost?.id === post.id;
-                return (
-                  <div
-                    key={post.id}
-                    onClick={() => handleSelectPost(post)}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer ${
-                      isSelected
-                        ? "bg-[#18192c] border-purple-500/80 shadow-md shadow-purple-500/10"
-                        : "bg-[#12131f] border-gray-800/80 hover:border-gray-700"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-1.5 text-xs text-gray-400">
-                      {post.isPinned && <Pin className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />}
-                      <span className="font-semibold text-white truncate">{post.authorName}</span>
-                      <span>•</span>
-                      <span className="capitalize text-purple-400">{post.scopeType}</span>
-                    </div>
-
-                    <h3 className="text-sm font-bold text-white line-clamp-2 leading-snug">
-                      {post.title}
-                    </h3>
-
-                    <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
-                      <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1">
-                          <ThumbsUp className="w-3 h-3 text-gray-400" />
-                          {post.upvoteCount}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MessageSquare className="w-3 h-3 text-gray-400" />
-                          {post.replyCount}
-                        </span>
-                      </div>
-
-                      {post.hasAcceptedAnswer && (
-                        <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                          <CheckCircle2 className="w-3 h-3" />
-                          Resolved
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          <button
+            onClick={() => setShowNewPostModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-600/20 transition-all self-start sm:self-auto"
+          >
+            <Plus className="w-4 h-4" />
+            Ask a Doubt
+          </button>
         </div>
 
-        {/* Right Column: Selected Thread View */}
-        <div className="lg:col-span-7 bg-[#12131f] border border-gray-800 rounded-2xl p-6 min-h-[500px]">
-          {selectedPost ? (
-            <div className="space-y-6">
-              {/* Question Header */}
-              <div className="border-b border-gray-800 pb-5">
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 border border-gray-700">
-                      <img src={selectedPost.authorAvatar || "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=64"} alt={selectedPost.authorName} className="w-full h-full object-cover" />
+        {/* Main Layout: Split list & thread viewer */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          {/* Left Column: Posts List */}
+          <div className="lg:col-span-5 space-y-4">
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="w-4 h-4 text-neutral-400 absolute left-3.5 top-3" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search doubts by title or tag..."
+                className="w-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-xl pl-10 pr-4 py-2 text-sm text-black dark:text-white placeholder-neutral-400 focus:outline-none focus:border-purple-500 shadow-sm"
+              />
+            </div>
+
+            {loading ? (
+              <div className="p-8 text-center text-neutral-500 text-sm">Loading discussions...</div>
+            ) : filteredPosts.length === 0 ? (
+              <div className="p-8 text-center bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 text-sm shadow-sm">
+                No matching doubts found.
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {filteredPosts.map((post) => {
+                  const isSelected = selectedPost?.id === post.id;
+                  return (
+                    <div
+                      key={post.id}
+                      onClick={() => handleSelectPost(post)}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                        isSelected
+                          ? "bg-purple-50 dark:bg-purple-950/20 border-purple-500 shadow-sm"
+                          : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 shadow-sm"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                        {post.isPinned && <Pin className="w-3.5 h-3.5 text-purple-600 dark:text-cyan-400 fill-current" />}
+                        <span className="font-semibold text-black dark:text-white truncate">{post.authorName}</span>
+                        <span>•</span>
+                        <span className="capitalize text-purple-600 dark:text-purple-400 font-medium">{post.scopeType}</span>
+                      </div>
+
+                      <h3 className="text-sm font-bold text-black dark:text-white line-clamp-2 leading-snug">
+                        {post.title}
+                      </h3>
+
+                      <div className="mt-3 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
+                        <div className="flex items-center gap-3">
+                          <span className="flex items-center gap-1">
+                            <ThumbsUp className="w-3 h-3 text-neutral-400" />
+                            {post.upvoteCount}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageSquare className="w-3 h-3 text-neutral-400" />
+                            {post.replyCount}
+                          </span>
+                        </div>
+
+                        {post.hasAcceptedAnswer && (
+                          <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Resolved
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-white">{selectedPost.authorName}</div>
-                      <div className="text-[10px] text-gray-400 capitalize">{selectedPost.authorRole}</div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Selected Thread View */}
+          <div className="lg:col-span-7 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 min-h-[500px] shadow-sm">
+            {selectedPost ? (
+              <div className="space-y-6">
+                {/* Question Header */}
+                <div className="border-b border-neutral-200 dark:border-neutral-800 pb-5">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center font-bold text-xs text-neutral-700 dark:text-neutral-300">
+                        {selectedPost.authorName.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-black dark:text-white">{selectedPost.authorName}</div>
+                        <div className="text-[10px] text-neutral-500 dark:text-neutral-400 capitalize">{selectedPost.authorRole}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleUpvote("post", selectedPost.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white"
+                      >
+                        <ThumbsUp className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                        <span>{selectedPost.upvoteCount} Upvotes</span>
+                      </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-black dark:text-white mt-3">{selectedPost.title}</h2>
+                  <div className="text-sm text-neutral-700 dark:text-neutral-300 mt-2 whitespace-pre-wrap leading-relaxed">
+                    {selectedPost.content}
+                  </div>
+
+                  {selectedPost.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {selectedPost.tags.map((tag) => (
+                        <span key={tag} className="text-[11px] font-medium bg-purple-500/10 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded border border-purple-500/20">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Replies Section */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    Replies ({replies.length})
+                  </h3>
+
+                  {repliesLoading ? (
+                    <div className="text-xs text-neutral-500">Loading replies...</div>
+                  ) : replies.length === 0 ? (
+                    <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200 dark:border-neutral-800 text-center text-xs text-neutral-500">
+                      No replies yet. Be the first to answer this doubt!
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {replies.map((reply) => (
+                        <div
+                          key={reply.id}
+                          className={`p-4 rounded-xl border ${
+                            reply.isAccepted
+                              ? "bg-emerald-500/5 border-emerald-500/30 shadow-sm"
+                              : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-black dark:text-white">{reply.authorName}</span>
+                              {reply.isInstructorAnswer && (
+                                <span className="flex items-center gap-1 text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-500/15 px-1.5 py-0.5 rounded border border-purple-500/30">
+                                  <UserCheck className="w-3 h-3" />
+                                  Instructor
+                                </span>
+                              )}
+                              {reply.isAccepted && (
+                                <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  Accepted Solution (+75 XP)
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleUpvote("reply", reply.id)}
+                                className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center gap-1"
+                              >
+                                <ThumbsUp className="w-3 h-3" />
+                                {reply.upvoteCount}
+                              </button>
+
+                              {!reply.isAccepted && (user?.uid === selectedPost.authorId || role === "trainer") && (
+                                <button
+                                  onClick={() => handleAcceptAnswer(reply.id)}
+                                  className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 hover:underline bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20"
+                                >
+                                  Accept Answer
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                            {reply.content}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add Reply Input */}
+                  <div className="pt-3 border-t border-neutral-200 dark:border-neutral-800 flex gap-2">
+                    <input
+                      type="text"
+                      value={replyContent}
+                      onChange={(e) => setReplyContent(e.target.value)}
+                      placeholder="Write a clear, helpful reply..."
+                      className="flex-1 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl px-4 py-2 text-sm text-black dark:text-white focus:outline-none focus:border-purple-500 shadow-sm"
+                    />
                     <button
-                      onClick={() => handleUpvote("post", selectedPost.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-800/80 border border-gray-700 text-gray-300 hover:text-white"
+                      onClick={handleAddReply}
+                      disabled={submittingReply || !replyContent.trim()}
+                      className="px-4 py-2 rounded-xl text-sm font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-1.5 transition-all disabled:opacity-50"
                     >
-                      <ThumbsUp className="w-3.5 h-3.5 text-purple-400" />
-                      <span>{selectedPost.upvoteCount} Upvotes</span>
+                      <Send className="w-3.5 h-3.5" />
+                      Reply
                     </button>
                   </div>
                 </div>
-
-                <h2 className="text-lg font-bold text-white mt-3">{selectedPost.title}</h2>
-                <div className="text-sm text-gray-300 mt-2 whitespace-pre-wrap leading-relaxed">
-                  {selectedPost.content}
-                </div>
-
-                {selectedPost.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {selectedPost.tags.map((tag) => (
-                      <span key={tag} className="text-[11px] font-medium bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded border border-purple-500/20">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
-
-              {/* Replies Section */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-purple-400" />
-                  Replies ({replies.length})
-                </h3>
-
-                {repliesLoading ? (
-                  <div className="text-xs text-gray-400">Loading replies...</div>
-                ) : replies.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-gray-900/40 border border-gray-800 text-center text-xs text-gray-400">
-                    No replies yet. Be the first to answer this doubt!
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {replies.map((reply) => (
-                      <div
-                        key={reply.id}
-                        className={`p-4 rounded-xl border ${
-                          reply.isAccepted
-                            ? "bg-emerald-950/20 border-emerald-500/40 shadow-sm shadow-emerald-500/5"
-                            : "bg-gray-900/50 border-gray-800"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-white">{reply.authorName}</span>
-                            {reply.isInstructorAnswer && (
-                              <span className="flex items-center gap-1 text-[10px] font-bold text-purple-300 bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/40">
-                                <UserCheck className="w-3 h-3" />
-                                Instructor
-                              </span>
-                            )}
-                            {reply.isAccepted && (
-                              <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/40">
-                                <CheckCircle2 className="w-3 h-3" />
-                                Accepted Solution (+75 XP)
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => handleUpvote("reply", reply.id)}
-                              className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
-                            >
-                              <ThumbsUp className="w-3 h-3" />
-                              {reply.upvoteCount}
-                            </button>
-
-                            {/* Mark Accepted Button (Only for Question Author or Trainer) */}
-                            {!reply.isAccepted && (user?.uid === selectedPost.authorId || role === "trainer") && (
-                              <button
-                                onClick={() => handleAcceptAnswer(reply.id)}
-                                className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30"
-                              >
-                                Accept Answer
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap">
-                          {reply.content}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Add Reply Input */}
-                <div className="pt-3 border-t border-gray-800 flex gap-2">
-                  <input
-                    type="text"
-                    value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
-                    placeholder="Write a clear, helpful reply..."
-                    className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
-                  />
-                  <button
-                    onClick={handleAddReply}
-                    disabled={submittingReply || !replyContent.trim()}
-                    className="px-4 py-2 rounded-xl text-sm font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-1.5 transition-all disabled:opacity-50"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    Reply
-                  </button>
-                </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center text-neutral-400 py-20">
+                <MessageSquare className="w-12 h-12 text-neutral-300 dark:text-neutral-700 mb-3" />
+                <h3 className="text-base font-bold text-neutral-700 dark:text-neutral-300">Select a discussion thread</h3>
+                <p className="text-xs text-neutral-500 max-w-xs mt-1">
+                  Choose a doubt from the left column to read replies or write a verified solution.
+                </p>
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 py-20">
-              <MessageSquare className="w-12 h-12 text-gray-700 mb-3" />
-              <h3 className="text-base font-bold text-gray-300">Select a discussion thread</h3>
-              <p className="text-xs text-gray-500 max-w-xs mt-1">
-                Choose a doubt from the left column to read replies or write a verified solution.
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Ask Doubt Modal */}
-      {showNewPostModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#12131f] border border-gray-800 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
-            <h2 className="text-xl font-bold text-white">Ask a Doubt to Your Batch &amp; Mentors</h2>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1">Doubt Title</label>
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="e.g. Next.js 15 Streaming SSR hydration error in parallel routes"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1">Details &amp; Code Snippets</label>
-              <textarea
-                rows={5}
-                value={newContent}
-                onChange={(e) => setNewContent(e.target.value)}
-                placeholder="Explain what you tried, the exact error code, and expected behavior..."
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1">Tags (comma-separated)</label>
-              <input
-                type="text"
-                value={newTags}
-                onChange={(e) => setNewTags(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"
-              />
-            </div>
-
-            <div className="flex justify-end gap-3 pt-3">
-              <button
-                onClick={() => setShowNewPostModal(false)}
-                className="px-4 py-2 rounded-xl text-sm font-semibold text-gray-400 hover:text-white"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreatePost}
-                disabled={submittingPost}
-                className="px-5 py-2 rounded-xl text-sm font-bold bg-purple-600 hover:bg-purple-500 text-white transition-all disabled:opacity-50"
-              >
-                {submittingPost ? "Submitting..." : "Post Doubt"}
-              </button>
-            </div>
+            )}
           </div>
         </div>
-      )}
+
+        {/* Ask Doubt Modal */}
+        {showNewPostModal && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
+              <h2 className="text-xl font-bold text-black dark:text-white">Ask a Doubt to Your Batch &amp; Mentors</h2>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">Doubt Title</label>
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="e.g. Next.js 15 Streaming SSR hydration error in parallel routes"
+                  className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">Details &amp; Code Snippets</label>
+                <textarea
+                  rows={5}
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  placeholder="Explain what you tried, the exact error code, and expected behavior..."
+                  className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  value={newTags}
+                  onChange={(e) => setNewTags(e.target.value)}
+                  className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-xl px-3 py-2 text-sm text-black dark:text-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3">
+                <button
+                  onClick={() => setShowNewPostModal(false)}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreatePost}
+                  disabled={submittingPost}
+                  className="px-5 py-2 rounded-xl text-sm font-bold bg-purple-600 hover:bg-purple-500 text-white transition-all disabled:opacity-50"
+                >
+                  {submittingPost ? "Submitting..." : "Post Doubt"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <Footer />
     </div>
   );
 }

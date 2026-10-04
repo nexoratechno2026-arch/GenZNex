@@ -83,31 +83,31 @@ export default function CourseLearnIndexPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-[#07080f] text-white flex flex-col items-center justify-center p-6">
-        <Loader2 className="w-10 h-10 text-purple-500 animate-spin mb-4" />
-        <p className="text-gray-400 font-mono text-sm tracking-wide">Initializing learning environment...</p>
+      <div className="min-h-screen bg-white text-neutral-900 dark:bg-black dark:text-white flex flex-col items-center justify-center p-6">
+        <Loader2 className="w-10 h-10 text-violet-600 animate-spin mb-4" />
+        <p className="text-neutral-500 font-mono text-sm tracking-wide">Initializing learning environment...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#07080f] text-white flex flex-col items-center justify-center p-6">
-      <div className="max-w-md w-full glass-panel p-8 rounded-2xl border border-gray-800 text-center">
-        <div className="w-12 h-12 mx-auto rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mb-4">
+    <div className="min-h-screen bg-white text-neutral-900 dark:bg-black dark:text-white flex flex-col items-center justify-center p-6">
+      <div className="max-w-md w-full p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-xl text-center">
+        <div className="w-12 h-12 mx-auto rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 mb-4">
           <AlertCircle className="w-6 h-6" />
         </div>
-        <h2 className="text-xl font-bold mb-2">Curriculum Unavailable</h2>
-        <p className="text-sm text-gray-400 mb-6">{error}</p>
+        <h2 className="text-xl font-bold mb-2 text-neutral-900 dark:text-white">Curriculum Unavailable</h2>
+        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">{error}</p>
         <div className="flex gap-3 justify-center">
           <Link
             href="/courses"
-            className="px-4 py-2 text-xs font-semibold rounded-xl bg-gray-800 hover:bg-gray-700 transition flex items-center gap-2"
+            className="px-4 py-2 text-xs font-semibold rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700 transition flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Catalog
           </Link>
           <Link
             href={`/courses/${courseSlug}`}
-            className="px-4 py-2 text-xs font-semibold rounded-xl bg-purple-600 hover:bg-purple-500 transition flex items-center gap-2"
+            className="btn-primary px-4 py-2 text-xs font-semibold rounded-xl text-white transition flex items-center gap-2"
           >
             <BookOpen className="w-4 h-4" /> Course Overview
           </Link>

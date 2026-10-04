@@ -66,108 +66,114 @@ export async function searchCourses(filters: CourseSearchFilters = {}): Promise<
   } = filters;
 
   const coursesCol = collection(db, "courses");
-  const constraints: QueryConstraint[] = [];
+  let courses: CourseDoc[] = [];
 
-  // Filter by course status (default: 'published' for public catalog)
-  constraints.push(where("status", "==", status));
-
-  // Category filter (slug or ID)
-  if (category && category !== "all") {
-    constraints.push(where("category", "==", category));
+  try {
+    // 1. Primary query: Fetch courses by status
+    const qStatus = query(coursesCol, where("status", "==", status));
+    const snapshot = await getDocs(qStatus);
+    snapshot.forEach((snap) => {
+      courses.push({ id: snap.id, ...(snap.data() as Omit<CourseDoc, "id">) });
+    });
+  } catch (err) {
+    console.warn("[CourseSearch] Primary status query failed, attempting general fetch:", err);
   }
 
-  // Level filter
-  if (level && level !== "all") {
-    constraints.push(where("level", "==", level));
-  }
-
-  // Language filter
-  if (language && language !== "all") {
-    constraints.push(where("language", "==", language));
-  }
-
-  // Free vs Paid filter
-  if (price === "free") {
-    constraints.push(where("priceInPaise", "==", 0));
-  } else if (price === "paid") {
-    constraints.push(where("priceInPaise", ">", 0));
-  }
-
-  // Sorting
-  switch (sort) {
-    case "popular":
-      constraints.push(orderBy("enrollmentCount", "desc"));
-      break;
-    case "newest":
-      constraints.push(orderBy("createdAt", "desc"));
-      break;
-    case "price_asc":
-      constraints.push(orderBy("priceInPaise", "asc"));
-      break;
-    case "price_desc":
-      constraints.push(orderBy("priceInPaise", "desc"));
-      break;
-    case "rating":
-      constraints.push(orderBy("rating", "desc"));
-      break;
-    default:
-      constraints.push(orderBy("enrollmentCount", "desc"));
-      break;
-  }
-
-  // Pagination support
-  let lastDocSnap: DocumentSnapshot | null = null;
-  if (lastDocId) {
+  // 2. Resilient Fallback: If 0 courses found or query failed, fetch all courses and filter published/approved
+  if (courses.length === 0) {
     try {
-      const docRef = doc(db, "courses", lastDocId);
-      lastDocSnap = await getDoc(docRef);
-    } catch (e) {
-      // Fallback if document not found
+      const qAll = query(coursesCol, limit(100));
+      const allSnap = await getDocs(qAll);
+      allSnap.forEach((snap) => {
+        const data = snap.data() as Omit<CourseDoc, "id">;
+        if (data.status === "published" || (data.status as string) === "approved" || data.isPublished === true) {
+          courses.push({ id: snap.id, ...data });
+        }
+      });
+    } catch (err) {
+      console.error("[CourseSearch] General fetch fallback error:", err);
     }
   }
 
-  if (lastDocSnap && lastDocSnap.exists()) {
-    constraints.push(startAfter(lastDocSnap));
+  // Deduplicate courses by ID
+  const courseMap = new Map<string, CourseDoc>();
+  courses.forEach((c) => courseMap.set(c.id, c));
+  courses = Array.from(courseMap.values());
+
+  // 3. Category filter (matches category slug or categoryName)
+  if (category && category !== "all") {
+    const catLower = category.toLowerCase().trim();
+    courses = courses.filter((c) => {
+      const cCat = (c.category || "").toLowerCase().trim();
+      const cCatName = (c.categoryName || "").toLowerCase().trim();
+      return cCat === catLower || cCatName === catLower || cCat.includes(catLower);
+    });
   }
 
-  // Request pageSize + 1 to determine hasMore
-  constraints.push(limit(pageSize + 1));
-
-  const q = query(coursesCol, ...constraints);
-  const snapshot = await getDocs(q);
-
-  let courses: CourseDoc[] = [];
-  snapshot.forEach((snap) => {
-    courses.push({ id: snap.id, ...(snap.data() as Omit<CourseDoc, "id">) });
-  });
-
-  const hasMore = courses.length > pageSize;
-  if (hasMore) {
-    courses = courses.slice(0, pageSize);
+  // 4. Level filter
+  if (level && level !== "all") {
+    courses = courses.filter((c) => c.level === level);
   }
 
-  // Client-side text filter for search query keywords and minRating fallback
+  // 5. Language filter
+  if (language && language !== "all") {
+    courses = courses.filter((c) => (c.language || "English").toLowerCase() === language.toLowerCase());
+  }
+
+  // 6. Free vs Paid filter
+  if (price === "free") {
+    courses = courses.filter((c) => (c.priceInPaise || 0) === 0);
+  } else if (price === "paid") {
+    courses = courses.filter((c) => (c.priceInPaise || 0) > 0);
+  }
+
+  // 7. Search text filter (title, subtitle, categoryName, instructor.name, tags)
   if (searchQuery.trim().length > 0) {
     const qLower = searchQuery.toLowerCase().trim();
     courses = courses.filter((c) => {
-      const titleMatch = c.title.toLowerCase().includes(qLower);
-      const subtitleMatch = c.subtitle?.toLowerCase().includes(qLower);
-      const categoryMatch = c.categoryName?.toLowerCase().includes(qLower);
-      const instructorMatch = c.instructor?.name?.toLowerCase().includes(qLower);
+      const titleMatch = (c.title || "").toLowerCase().includes(qLower);
+      const subtitleMatch = (c.subtitle || "").toLowerCase().includes(qLower);
+      const categoryMatch = (c.categoryName || "").toLowerCase().includes(qLower);
+      const instructorMatch = (c.instructor?.name || c.trainerName || "").toLowerCase().includes(qLower);
       const tagMatch = c.tags?.some((t) => t.toLowerCase().includes(qLower));
       return titleMatch || subtitleMatch || categoryMatch || instructorMatch || tagMatch;
     });
   }
 
+  // 8. Min rating filter
   if (minRating > 0) {
     courses = courses.filter((c) => (c.rating || 0) >= minRating);
   }
 
-  const nextLastDocId = courses.length > 0 ? courses[courses.length - 1].id : undefined;
+  // 9. Safe In-memory Sorting (never drops courses with missing fields!)
+  courses.sort((a, b) => {
+    switch (sort) {
+      case "popular":
+        return (b.enrollmentCount || 0) - (a.enrollmentCount || 0);
+      case "newest": {
+        const timeA = (a.publishedAt as any)?.toMillis?.() || (a.createdAt as any)?.toMillis?.() || 0;
+        const timeB = (b.publishedAt as any)?.toMillis?.() || (b.createdAt as any)?.toMillis?.() || 0;
+        return timeB - timeA;
+      }
+      case "price_asc":
+        return (a.priceInPaise || 0) - (b.priceInPaise || 0);
+      case "price_desc":
+        return (b.priceInPaise || 0) - (a.priceInPaise || 0);
+      case "rating":
+        return (b.rating || 0) - (a.rating || 0);
+      default:
+        return (b.enrollmentCount || 0) - (a.enrollmentCount || 0);
+    }
+  });
+
+  const totalEstimate = courses.length;
+  const hasMore = courses.length > pageSize;
+  const paginatedCourses = courses.slice(0, pageSize);
+  const nextLastDocId = paginatedCourses.length > 0 ? paginatedCourses[paginatedCourses.length - 1].id : undefined;
 
   return {
-    courses,
-    totalEstimate: courses.length,
+    courses: paginatedCourses,
+    totalEstimate,
     lastDocId: nextLastDocId,
     hasMore,
   };
@@ -178,15 +184,27 @@ export async function searchCourses(filters: CourseSearchFilters = {}): Promise<
  */
 export async function getCourseBySlug(slug: string): Promise<CourseDoc | null> {
   const coursesCol = collection(db, "courses");
-  const q = query(coursesCol, where("slug", "==", slug), limit(1));
-  const snapshot = await getDocs(q);
+  try {
+    const q = query(coursesCol, where("slug", "==", slug), limit(1));
+    const snapshot = await getDocs(q);
 
-  if (snapshot.empty) {
-    return null;
+    if (!snapshot.empty) {
+      const docSnap = snapshot.docs[0];
+      return { id: docSnap.id, ...(docSnap.data() as Omit<CourseDoc, "id">) };
+    }
+  } catch (err) {
+    console.warn("[CourseSearch] getCourseBySlug query error:", err);
   }
 
-  const docSnap = snapshot.docs[0];
-  return { id: docSnap.id, ...(docSnap.data() as Omit<CourseDoc, "id">) };
+  // Fallback: check if slug matches course ID directly
+  try {
+    const directDoc = await getDoc(doc(db, "courses", slug));
+    if (directDoc.exists()) {
+      return { id: directDoc.id, ...(directDoc.data() as Omit<CourseDoc, "id">) };
+    }
+  } catch (e) {}
+
+  return null;
 }
 
 /**
@@ -226,50 +244,44 @@ export async function getCourseCurriculum(courseId: string): Promise<CourseCurri
  * Fetch all categories
  */
 export async function getCategories(): Promise<CategoryDoc[]> {
-  const catCol = collection(db, "categories");
-  const q = query(catCol, orderBy("order", "asc"));
-  const snapshot = await getDocs(q);
+  try {
+    const catCol = collection(db, "categories");
+    const snapshot = await getDocs(catCol);
 
-  return snapshot.docs.map((docSnap) => ({
-    id: docSnap.id,
-    ...(docSnap.data() as Omit<CategoryDoc, "id">),
-  }));
+    const list = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...(docSnap.data() as Omit<CategoryDoc, "id">),
+    }));
+    return list.sort((a, b) => (a.order || 0) - (b.order || 0));
+  } catch (err) {
+    console.error("Failed to fetch categories:", err);
+    return [];
+  }
 }
 
 /**
  * Fetch featured courses for homepage and promotions
  */
 export async function getFeaturedCourses(limitCount = 4): Promise<CourseDoc[]> {
-  const coursesCol = collection(db, "courses");
-  const q = query(
-    coursesCol,
-    where("status", "==", "published"),
-    where("isFeatured", "==", true),
-    limit(limitCount)
-  );
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs.map((d) => ({
-    id: d.id,
-    ...(d.data() as Omit<CourseDoc, "id">),
-  }));
+  try {
+    const res = await searchCourses({ pageSize: limitCount * 2 });
+    const featured = res.courses.filter((c) => c.isFeatured);
+    return (featured.length > 0 ? featured : res.courses).slice(0, limitCount);
+  } catch (e) {
+    console.warn("getFeaturedCourses error:", e);
+    return [];
+  }
 }
 
 /**
  * Fetch popular published courses
  */
 export async function getPopularCourses(limitCount = 6): Promise<CourseDoc[]> {
-  const coursesCol = collection(db, "courses");
-  const q = query(
-    coursesCol,
-    where("status", "==", "published"),
-    orderBy("enrollmentCount", "desc"),
-    limit(limitCount)
-  );
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs.map((d) => ({
-    id: d.id,
-    ...(d.data() as Omit<CourseDoc, "id">),
-  }));
+  try {
+    const res = await searchCourses({ sort: "popular", pageSize: limitCount });
+    return res.courses;
+  } catch (e) {
+    console.warn("getPopularCourses error:", e);
+    return [];
+  }
 }

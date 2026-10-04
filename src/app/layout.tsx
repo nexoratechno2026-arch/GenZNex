@@ -8,7 +8,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#000000",
+  themeColor: "#0d0d14",
 };
 
 export const metadata: Metadata = {
@@ -41,14 +41,19 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Inter + Manrope — core typography stack */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap"
+        />
+        {/* Material Symbols for icons */}
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
       </head>
       <body
-        className="min-h-full flex flex-col bg-black text-white dark:bg-black dark:text-white selection:bg-white selection:text-black dark:selection:bg-white dark:selection:text-black"
-        style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+        className="min-h-full flex flex-col"
         suppressHydrationWarning
       >
         <ThemeProvider>

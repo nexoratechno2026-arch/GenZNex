@@ -1,31 +1,84 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+@variant light (&:where(.light, .light *));
+
+/* ─── Design Tokens ─────────────────────────────── */
 @layer base {
   :root {
-    --background: #000000;
-    --foreground: #ffffff;
-    --card: #000000;
-    --card-foreground: #ffffff;
-    --border: #333333;
+    /* Rich dark-mode palette (default) */
+    --bg-base:        #0d0d14;
+    --bg-surface:     #13131f;
+    --bg-elevated:    #1a1a2e;
+    --bg-overlay:     #1f1f35;
+
+    --border-subtle:  #272740;
+    --border-default: #32325a;
+    --border-strong:  #4a4a7a;
+
+    --text-primary:   #f0f0f8;
+    --text-secondary: #a0a0c0;
+    --text-muted:     #5a5a80;
+    --text-faint:     #3a3a60;
+
+    /* Brand palette */
+    --brand-violet:   #7c5cfc;
+    --brand-indigo:   #5b7fff;
+    --brand-amber:    #f5a623;
+    --brand-rose:     #ff5a7e;
+    --brand-emerald:  #34d399;
+
+    /* Glow effects */
+    --glow-violet:    rgba(124, 92, 252, 0.25);
+    --glow-indigo:    rgba(91, 127, 255, 0.2);
+    --glow-amber:     rgba(245, 166, 35, 0.2);
+
+    /* Semantic */
+    --background:     var(--bg-base);
+    --foreground:     var(--text-primary);
+    --card:           var(--bg-surface);
+    --card-foreground: var(--text-primary);
+    --border:         var(--border-subtle);
   }
 
-  .light {
-    --background: #ffffff;
-    --foreground: #000000;
-    --card: #ffffff;
-    --card-foreground: #000000;
-    --border: #e5e5e5;
+  .light,
+  [data-theme="light"] {
+    --bg-base:        #ffffff;
+    --bg-surface:     #ffffff;
+    --bg-elevated:    #f8f8fc;
+    --bg-overlay:     #f0eff8;
+
+    --border-subtle:  #eae8f5;
+    --border-default: #d8d5e8;
+    --border-strong:  #9e9bb8;
+
+    --text-primary:   #111022;
+    --text-secondary: #423f5e;
+    --text-muted:     #6e6b8c;
+    --text-faint:     #c2bfd8;
+
+    --brand-violet:   #6d3ef0;
+    --brand-indigo:   #4a6bef;
+    --brand-amber:    #d4870c;
+    --brand-rose:     #e6325a;
+    --brand-emerald:  #1db87a;
+
+    --background:     var(--bg-base);
+    --foreground:     var(--text-primary);
+    --card:           var(--bg-surface);
+    --card-foreground: var(--text-primary);
+    --border:         var(--border-subtle);
   }
 }
 
-/* 1. Global Typography: Every word in Arial */
+/* ─── Base Reset & Typography ───────────────────── */
 *,
 *::before,
 *::after {
-  font-family: Arial, Helvetica, sans-serif !important;
+  box-sizing: border-box;
 }
 
-/* 2. Google Material Symbols Font Protection */
+/* Protect icon font */
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined' !important;
   font-weight: normal;
@@ -41,145 +94,508 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* 3. Base High-Contrast Setup */
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif !important;
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  line-height: 1.6;
+  font-size: 15px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Night Mode (Dark) Defaults */
-html.dark body,
-body {
-  background-color: #000000;
+/* Headings use Manrope for personality */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Manrope', 'Inter', sans-serif;
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 800; }
+h2 { font-size: clamp(1.25rem, 3vw, 1.875rem); font-weight: 700; }
+h3 { font-size: clamp(1rem, 2.5vw, 1.375rem); font-weight: 700; }
+h4 { font-size: 1.1rem; font-weight: 600; }
+
+p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+a {
+  color: var(--brand-violet);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover {
+  color: var(--brand-indigo);
+}
+
+/* Text selection — feels branded, not generic blue */
+::selection {
+  background-color: rgba(124, 92, 252, 0.3);
+  color: var(--text-primary);
+}
+
+/* ─── Scrollbar (subtle, not ugly) ─────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Form Elements ──────────────────────────────── */
+input:not([type="radio"]):not([type="checkbox"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+textarea,
+select {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+  width: 100%;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  width: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  accent-color: var(--brand-violet) !important;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+input:not([type="radio"]):not([type="checkbox"])::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+input:not([type="radio"]):not([type="checkbox"]):focus,
+textarea:focus,
+select:focus {
+  border-color: var(--brand-violet);
+  box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.15);
+}
+
+.light input:not([type="radio"]):not([type="checkbox"]),
+.light textarea,
+.light select {
+  background-color: #fff;
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+.light input:not([type="radio"]):not([type="checkbox"])::placeholder,
+.light textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ─── Button System ─────────────────────────────── */
+
+/* Primary — violet with glow */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #7c5cfc 0%, #5b7fff 100%);
   color: #ffffff;
+  box-shadow: 0 4px 15px rgba(124, 92, 252, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(124, 92, 252, 0.45);
+}
+.btn-primary:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 8px rgba(124, 92, 252, 0.3);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
 }
 
-html.dark h1,
-html.dark h2,
-html.dark h3,
-html.dark h4,
-html.dark h5,
-html.dark h6,
-html.dark p,
-html.dark label {
+/* Secondary — surface with border */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  white-space: nowrap;
+}
+.btn-secondary:hover {
+  background: var(--bg-overlay);
+  border-color: var(--border-strong);
+}
+.btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Ghost / Outline */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--brand-violet);
+  border: 1px solid var(--brand-violet);
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+.btn-outline:hover {
+  background: rgba(124, 92, 252, 0.1);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.btn-ghost:hover {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+/* Danger */
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: #e6325a;
   color: #ffffff;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.btn-danger:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
-/* Light Mode Defaults */
-html.light body {
-  background-color: #ffffff;
-  color: #000000;
+/* Legacy aliases — mirror btn-primary styles */
+.glow-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #7c5cfc 0%, #5b7fff 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(124, 92, 252, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+.glow-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(124, 92, 252, 0.45);
 }
 
-html.light h1,
-html.light h2,
-html.light h3,
-html.light h4,
-html.light h5,
-html.light h6,
-html.light p,
-html.light label {
-  color: #000000;
+/* Legacy alias — mirror btn-secondary styles */
+.glow-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  white-space: nowrap;
+}
+.glow-btn-secondary:hover {
+  background: var(--bg-overlay);
+  border-color: var(--border-strong);
 }
 
-/* 4. Complete Button & High-Contrast Word Visibility Enforcement */
-/* Any black-background container or button MUST have pure white text */
-.bg-black,
-.bg-neutral-900,
-.bg-neutral-950,
-button.bg-black,
-button.bg-neutral-900,
-.glow-btn-primary,
-html.light button.bg-black,
-html.light a.bg-black {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-}
-
-.bg-black *,
-.bg-neutral-900 *,
-.bg-neutral-950 *,
-button.bg-black *,
-button.bg-neutral-900 *,
-.glow-btn-primary *,
-html.light button.bg-black *,
-html.light a.bg-black * {
-  color: #ffffff !important;
-}
-
-/* Any white-background container or button MUST have pure black text */
-.bg-white,
-button.bg-white,
-.glow-btn-secondary,
-html.light button.bg-white,
-html.light a.bg-white,
-html.dark button.dark\:bg-white,
-html.dark a.dark\:bg-white {
-  color: #000000 !important;
-}
-
-.bg-white *,
-button.bg-white *,
-.glow-btn-secondary *,
-html.light button.bg-white *,
-html.light a.bg-white *,
-html.dark button.dark\:bg-white *,
-html.dark a.dark\:bg-white * {
-  color: #000000 !important;
-}
-
-/* Specific Dark Mode overrides for inverted components */
-html.dark .dark\:bg-black {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-}
-html.dark .dark\:bg-black * {
-  color: #ffffff !important;
-}
-
-html.dark .dark\:bg-white {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-}
-html.dark .dark\:bg-white * {
-  color: #000000 !important;
-}
-
-/* 5. Disable all gradient or rainbow text */
-.glow-text-gradient,
-[class*="bg-clip-text"] {
-  background: none !important;
-  -webkit-text-fill-color: currentColor !important;
-  color: inherit !important;
-}
-
-/* Cards & Panels */
+/* ─── Card / Panel System ───────────────────────── */
 .glass-card,
 .glass-panel {
-  background-color: #000000;
-  border: 1px solid #333333;
-  color: #ffffff;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  color: var(--text-primary);
 }
 
-html.light .glass-card,
-html.light .glass-panel {
-  background-color: #ffffff !important;
-  border: 1px solid #e5e5e5 !important;
-  color: #000000 !important;
+/* Cards with a subtle inner glow on hover */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
-/* Grid Pattern */
+/* ─── Badges & Tags ─────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.badge-violet {
+  background: rgba(124, 92, 252, 0.15);
+  color: #a07af8;
+  border: 1px solid rgba(124, 92, 252, 0.25);
+}
+.badge-amber {
+  background: rgba(245, 166, 35, 0.15);
+  color: #f5c842;
+  border: 1px solid rgba(245, 166, 35, 0.25);
+}
+.badge-emerald {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+.badge-rose {
+  background: rgba(255, 90, 126, 0.12);
+  color: #ff7096;
+  border: 1px solid rgba(255, 90, 126, 0.2);
+}
+.badge-indigo {
+  background: rgba(91, 127, 255, 0.12);
+  color: #7fa3ff;
+  border: 1px solid rgba(91, 127, 255, 0.2);
+}
+/* Legacy - keep these working */
+.badge-black {
+  background: rgba(124, 92, 252, 0.15);
+  color: #a07af8;
+  border: 1px solid rgba(124, 92, 252, 0.25);
+}
+.badge-white {
+  background: rgba(240, 240, 248, 0.1);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+}
+
+/* ─── Text Gradient (actually beautiful now) ────── */
+.text-gradient-brand {
+  background: linear-gradient(135deg, #7c5cfc 0%, #5b7fff 60%, #f5a623 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Allow gradient text through — old override removed */
+.glow-text-gradient {
+  color: var(--text-primary);
+}
+
+/* ─── Grid / Background Patterns ───────────────── */
 .bg-grid-pattern {
-  background-size: 32px 32px;
+  background-size: 28px 28px;
   background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+    linear-gradient(to right, rgba(124, 92, 252, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(124, 92, 252, 0.05) 1px, transparent 1px);
 }
 
-html.dark .bg-grid-pattern {
+.light .bg-grid-pattern {
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(108, 72, 238, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(108, 72, 238, 0.06) 1px, transparent 1px);
+}
+
+/* Subtle dot-matrix noise for sections */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ─── Animations ────────────────────────────────── */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.3); }
+  50%       { box-shadow: 0 0 0 8px rgba(124, 92, 252, 0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease both;
+}
+.animate-fade-in {
+  animation: fade-in 0.3s ease both;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.35s ease both;
+}
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Loading shimmer skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 25%,
+    var(--bg-overlay) 50%,
+    var(--bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ─── Focus Ring ────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--brand-violet);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Dividers ──────────────────────────────────── */
+hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 24px 0;
+}
+
+/* ─── Utility: Glow Dots (decorative) ──────────── */
+.glow-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-violet);
+  box-shadow: 0 0 12px var(--brand-violet), 0 0 24px rgba(124, 92, 252, 0.4);
+}
+
+/* ─── Status Pill ───────────────────────────────── */
+.status-dot-live {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand-emerald);
+  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.2);
+  animation: pulse-glow 2s ease-in-out infinite;
 }

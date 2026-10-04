@@ -7,6 +7,7 @@ import type { UserRole } from "@/types/schema";
 import { useAuth } from "@/lib/context/AuthContext";
 import { Button } from "../ui/Button";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 
 interface NavbarProps {
   currentRole?: UserRole;
@@ -32,21 +33,9 @@ export function Navbar({ currentRole }: NavbarProps) {
     <header className="sticky top-0 z-50 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black text-black dark:text-white transition-colors duration-150">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         
-        {/* Brand Logo - Pure Black & White Arial */}
+        {/* Brand Logo - Official GenzNex Logo */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold">
-              <GoogleIcon name="bolt" size={22} filled />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold tracking-tight text-xl leading-none text-black dark:text-white">
-                GenZNex
-              </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-600 dark:text-neutral-400 mt-0.5">
-                EdTech India
-              </span>
-            </div>
-          </Link>
+          <BrandLogo size="md" href="/" />
         </div>
 
         {/* Desktop Nav Items */}

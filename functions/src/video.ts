@@ -4,12 +4,49 @@ export interface SignedPlaybackResult {
   playbackUrl: string;
   token?: string;
   expiresAt: number;
-  provider: "bunny" | "mux" | "vimeo" | "mock";
+  provider: "bunny" | "mux" | "vimeo" | "mock" | "youtube";
 }
 
 export interface VideoProvider {
-  name: "bunny" | "mux" | "vimeo" | "mock";
+  name: "bunny" | "mux" | "vimeo" | "mock" | "youtube";
   getSignedPlaybackUrl(videoId: string, expiresInSeconds?: number): Promise<SignedPlaybackResult>;
+}
+
+/**
+ * Extracts a clean 11-character YouTube video ID from various URL formats or raw IDs
+ */
+export function extractYouTubeId(urlOrId?: string): string | null {
+  if (!urlOrId) return null;
+  const trimmed = urlOrId.trim();
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+    return trimmed;
+  }
+  const shortMatch = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+  if (shortMatch) return shortMatch[1];
+  const longMatch =
+    trimmed.match(/[?&]v=([a-zA-Z0-9_-]{11})/) ||
+    trimmed.match(/embed\/([a-zA-Z0-9_-]{11})/);
+  if (longMatch) return longMatch[1];
+  return null;
+}
+
+/**
+ * YouTube Video Provider Implementation
+ */
+export class YouTubeVideoProvider implements VideoProvider {
+  name = "youtube" as const;
+
+  async getSignedPlaybackUrl(videoId: string, expiresInSeconds: number = 7200): Promise<SignedPlaybackResult> {
+    const expiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds;
+    const cleanId = extractYouTubeId(videoId) || videoId;
+    const playbackUrl = `https://www.youtube-nocookie.com/embed/${cleanId}?autoplay=1&rel=0`;
+
+    return {
+      playbackUrl,
+      expiresAt,
+      provider: "youtube",
+    };
+  }
 }
 
 /**
@@ -99,8 +136,11 @@ export class MockVideoProvider implements VideoProvider {
 /**
  * Factory to instantiate configured video provider
  */
-export function getVideoProvider(): VideoProvider {
-  const provider = process.env.VIDEO_PROVIDER || "mock";
+export function getVideoProvider(providerName?: string): VideoProvider {
+  const provider = providerName || process.env.VIDEO_PROVIDER || "mock";
+  if (provider === "youtube") {
+    return new YouTubeVideoProvider();
+  }
   if (provider === "bunny") {
     return new BunnyStreamVideoProvider();
   }

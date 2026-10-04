@@ -19,6 +19,7 @@ import {
 import { httpsCallable } from "firebase/functions";
 import { db, functions } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/context/AuthContext";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import type { CourseDoc, ModuleDoc, LessonDoc, LessonNoteDoc } from "@/types/schema";
 import {
   Play,
@@ -47,7 +48,36 @@ import {
   Plus,
   Trash2,
   FileCheck,
+  Trophy,
 } from "lucide-react";
+
+function extractYouTubeId(urlOrId?: string | null): string | null {
+  if (!urlOrId) return null;
+  const trimmed = urlOrId.trim();
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+  const shortMatch = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+  if (shortMatch) return shortMatch[1];
+  const longMatch =
+    trimmed.match(/[?&]v=([a-zA-Z0-9_-]{11})/) ||
+    trimmed.match(/embed\/([a-zA-Z0-9_-]{11})/) ||
+    trimmed.match(/shorts\/([a-zA-Z0-9_-]{11})/) ||
+    trimmed.match(/live\/([a-zA-Z0-9_-]{11})/);
+  if (longMatch) return longMatch[1];
+  return null;
+}
+
+function extractGoogleDriveId(urlOrId?: string | null): string | null {
+  if (!urlOrId) return null;
+  const trimmed = urlOrId.trim();
+  const fileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/);
+  if (fileMatch) return fileMatch[1];
+  const idMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]{25,})/);
+  if (idMatch) return idMatch[1];
+  if (/^[a-zA-Z0-9_-]{25,50}$/.test(trimmed) && !trimmed.includes("http")) {
+    return trimmed;
+  }
+  return null;
+}
 
 export default function LearningPlayerPage() {
   const params = useParams();
@@ -96,9 +126,53 @@ export default function LearningPlayerPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [certificateLoading, setCertificateLoading] = useState(false);
   const [certificateSuccess, setCertificateSuccess] = useState<any | null>(null);
+  const [achievementToast, setAchievementToast] = useState<{
+    xp: number;
+    badges: string[];
+    moduleCompleted: boolean;
+    courseCompleted: boolean;
+    levelName: string;
+  } | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const lastHeartbeatTimeRef = useRef<number>(0);
+
+  // Determine video provider and IDs
+  const lessonVideoId = currentLesson?.videoMetadata?.videoId;
+  const lessonProvider = currentLesson?.videoMetadata?.provider;
+
+  // Google Drive detection
+  const detectedGoogleDriveId =
+    extractGoogleDriveId(lessonVideoId) ||
+    extractGoogleDriveId(playbackUrl);
+  const isGoogleDrive = Boolean(
+    detectedGoogleDriveId ||
+    lessonProvider === "googledrive" ||
+    (playbackUrl && playbackUrl.includes("drive.google.com")) ||
+    (lessonVideoId && lessonVideoId.includes("drive.google.com"))
+  );
+  const finalGoogleDriveId = detectedGoogleDriveId || (lessonVideoId ? extractGoogleDriveId(lessonVideoId) : null);
+  const googleDriveEmbedUrl = finalGoogleDriveId
+    ? `https://drive.google.com/file/d/${finalGoogleDriveId}/preview`
+    : null;
+
+  // YouTube detection
+  const detectedYouTubeId =
+    !isGoogleDrive &&
+    (extractYouTubeId(lessonVideoId) ||
+      extractYouTubeId(playbackUrl) ||
+      (lessonProvider === "youtube" && lessonVideoId && !["sample_video_01", "intro_01", "intro_vid", "demo_vid"].includes(lessonVideoId) ? lessonVideoId : null) ||
+      extractYouTubeId(course?.promoVideoUrl));
+
+  const isYouTube = Boolean(
+    !isGoogleDrive &&
+    (detectedYouTubeId ||
+      lessonProvider === "youtube" ||
+      (playbackUrl && (playbackUrl.includes("youtube.com") || playbackUrl.includes("youtu.be"))))
+  );
+
+  const finalYouTubeId = detectedYouTubeId || (course?.promoVideoUrl ? extractYouTubeId(course.promoVideoUrl) : null) || "55WrjuuKSWg";
+  const youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${finalYouTubeId}?rel=0&modestbranding=1`;
 
   // ---------------------------------------------------------------------------
   // 1. Initial Load: Fetch Course, Modules, Lessons, and Enrollment
@@ -284,6 +358,20 @@ export default function LearningPlayerPage() {
           setProgressPercent(res.data.progressPercentage);
           if (res.data.completed) {
             setCompletedLessonIds((prev) => new Set([...prev, lessonId]));
+            if (
+              (res.data.xpAwarded && res.data.xpAwarded > 0) ||
+              (res.data.newBadges && res.data.newBadges.length > 0) ||
+              res.data.moduleCompleted ||
+              res.data.courseCompleted
+            ) {
+              setAchievementToast({
+                xp: res.data.xpAwarded || 0,
+                badges: res.data.newBadges || [],
+                moduleCompleted: Boolean(res.data.moduleCompleted),
+                courseCompleted: Boolean(res.data.courseCompleted),
+                levelName: res.data.levelName || "Learner",
+              });
+            }
           }
         }
       } catch (err) {
@@ -292,6 +380,14 @@ export default function LearningPlayerPage() {
     },
     [user, course, lessonId, isEnrolled]
   );
+
+  useEffect(() => {
+    if (!achievementToast) return;
+    const timer = setTimeout(() => {
+      setAchievementToast(null);
+    }, 7000);
+    return () => clearTimeout(timer);
+  }, [achievementToast]);
 
   // Heartbeat every 15 seconds during active playback
   const handleTimeUpdate = () => {
@@ -475,8 +571,12 @@ export default function LearningPlayerPage() {
   };
 
   const handleManualComplete = () => {
-    setCompletedLessonIds((prev) => new Set([...prev, lessonId]));
-    syncProgressToServer(0, 0, true);
+    const isAlreadyDone = completedLessonIds.has(lessonId);
+    if (!isAlreadyDone) {
+      setCompletedLessonIds((prev) => new Set([...prev, lessonId]));
+      const durSec = Math.max(1, (currentLesson?.durationMinutes || 1) * 60);
+      syncProgressToServer(durSec, durSec, true);
+    }
   };
 
   const handleClaimCertificate = async () => {
@@ -499,34 +599,34 @@ export default function LearningPlayerPage() {
   // ---------------------------------------------------------------------------
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-[#07080f] text-white flex flex-col items-center justify-center">
-        <Loader2 className="w-10 h-10 text-purple-500 animate-spin mb-4" />
-        <p className="text-gray-400 font-mono text-sm">Loading secure curriculum video stream...</p>
+      <div className="min-h-screen bg-white text-neutral-900 dark:bg-black dark:text-white flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-violet-600 animate-spin mb-4" />
+        <p className="text-neutral-500 font-mono text-sm">Loading secure curriculum video stream...</p>
       </div>
     );
   }
 
   if (accessDenied || (!isEnrolled && !currentLesson?.isPreview)) {
     return (
-      <div className="min-h-screen bg-[#07080f] text-white flex flex-col items-center justify-center p-6">
-        <div className="max-w-md w-full glass-panel p-8 rounded-2xl border border-gray-800 text-center">
-          <div className="w-14 h-14 mx-auto rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-4">
+      <div className="min-h-screen bg-white text-neutral-900 dark:bg-black dark:text-white flex flex-col items-center justify-center p-6">
+        <div className="max-w-md w-full p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-xl text-center">
+          <div className="w-14 h-14 mx-auto rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400 mb-4">
             <Lock className="w-7 h-7" />
           </div>
-          <h2 className="text-xl font-bold mb-2">Enrollment Required</h2>
-          <p className="text-sm text-gray-400 mb-6">
+          <h2 className="text-xl font-bold mb-2 text-neutral-900 dark:text-white">Enrollment Required</h2>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
             This lesson is exclusive to enrolled students. Enroll now to unlock full HD video lessons, projects, quizzes, and your verified certificate.
           </p>
           <div className="flex flex-col gap-3">
             <Link
               href={`/checkout/${courseSlug}`}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 font-bold text-sm tracking-wide transition shadow-lg shadow-purple-600/25"
+              className="btn-primary w-full py-3 rounded-xl font-bold text-sm tracking-wide transition shadow-lg shadow-violet-600/25"
             >
               Enroll Now to Access
             </Link>
             <Link
               href={`/courses/${courseSlug}`}
-              className="text-xs text-gray-400 hover:text-white transition"
+              className="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-white transition"
             >
               View Course Syllabus
             </Link>
@@ -537,24 +637,26 @@ export default function LearningPlayerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#07080f] text-white flex flex-col">
+    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col transition-colors">
       {/* ----------------------------------------------------------------------- */}
       {/* Top Navbar */}
       {/* ----------------------------------------------------------------------- */}
-      <header className="h-14 border-b border-gray-800/80 bg-[#0d0f1a]/90 backdrop-blur-md px-4 flex items-center justify-between z-20 shrink-0">
+      <header className="h-14 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black px-4 flex items-center justify-between z-20 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href="/student"
-            className="p-1.5 rounded-lg bg-gray-800/60 hover:bg-gray-700 text-gray-300 hover:text-white transition"
+            className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-900 text-black dark:text-white transition"
             title="Back to Dashboard"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
+          <BrandLogo size="sm" showTagline={false} href="/student" />
+          <div className="hidden sm:block h-4 w-px bg-neutral-200 dark:bg-neutral-800" />
           <div className="overflow-hidden">
-            <span className="text-[11px] font-mono text-purple-400 uppercase tracking-wider font-semibold block">
+            <span className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400 uppercase tracking-wider font-semibold block">
               {course?.title || "GenZNex Course"}
             </span>
-            <h1 className="text-xs font-bold text-white truncate max-w-sm sm:max-w-md">
+            <h1 className="text-xs font-bold text-black dark:text-white truncate max-w-sm sm:max-w-md">
               {currentLesson?.title || "Lesson"}
             </h1>
           </div>
@@ -563,20 +665,20 @@ export default function LearningPlayerPage() {
         {/* Course Progress & Controls */}
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex items-center gap-3">
-            <div className="w-32 bg-gray-800 h-2 rounded-full overflow-hidden">
+            <div className="w-32 bg-neutral-200 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
               <div
-                className="bg-gradient-to-r from-purple-500 to-cyan-400 h-full transition-all duration-500"
+                className="bg-black dark:bg-white h-full transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-xs font-mono font-bold text-gray-300">{progressPercent}%</span>
+            <span className="text-xs font-mono font-bold text-black dark:text-white">{progressPercent}%</span>
           </div>
 
           {progressPercent >= 100 && (
             <button
               onClick={handleClaimCertificate}
               disabled={certificateLoading}
-              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/20 hover:brightness-110 transition"
+              className="btn-primary px-3 py-1.5 rounded-lg bg-black text-white dark:bg-white dark:text-black font-bold text-xs flex items-center gap-1.5 shadow transition"
             >
               {certificateLoading ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -589,7 +691,7 @@ export default function LearningPlayerPage() {
 
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white transition lg:hidden"
+            className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-900 text-black dark:text-white transition lg:hidden"
             title="Toggle Curriculum Sidebar"
           >
             <Menu className="w-5 h-5" />
@@ -670,131 +772,156 @@ export default function LearningPlayerPage() {
           {/* 1. LESSON VIEWER CONTAINER */}
           <div className="w-full bg-black rounded-2xl overflow-hidden border border-gray-800 shadow-2xl relative group">
             {currentLesson?.type === "video" ? (
-              <div className="relative aspect-video w-full bg-black flex items-center justify-center">
-                <video
-                  ref={videoRef}
-                  src={playbackUrl || undefined}
-                  className="w-full h-full object-contain cursor-pointer"
-                  onClick={() => {
-                    if (videoRef.current?.paused) {
-                      videoRef.current.play();
-                      setIsPlaying(true);
-                    } else {
-                      videoRef.current?.pause();
-                      setIsPlaying(false);
-                    }
-                  }}
-                  onTimeUpdate={handleTimeUpdate}
-                  onPause={handlePause}
-                  onPlay={() => setIsPlaying(true)}
-                  onEnded={handleEnded}
-                />
-
-                {/* Custom Video Controls Bar */}
-                <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-2">
-                  {/* Seek Bar */}
-                  <input
-                    type="range"
-                    min={0}
-                    max={duration || 100}
-                    value={currentTime}
-                    onChange={(e) => {
-                      const val = Number(e.target.value);
-                      setCurrentTime(val);
-                      if (videoRef.current) videoRef.current.currentTime = val;
-                    }}
-                    className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+              <div className="relative aspect-video w-full bg-black">
+                {isGoogleDrive && googleDriveEmbedUrl ? (
+                  <iframe
+                    src={googleDriveEmbedUrl}
+                    title={currentLesson?.title || "Lesson Video"}
+                    className="absolute inset-0 w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
                   />
+                ) : isYouTube ? (
+                  <iframe
+                    src={youtubeEmbedUrl}
+                    title={currentLesson?.title || "Lesson Video"}
+                    className="absolute inset-0 w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                ) : playbackUrl ? (
+                  <>
+                    <video
+                      ref={videoRef}
+                      src={playbackUrl}
+                      className="w-full h-full object-contain cursor-pointer"
+                      onClick={() => {
+                        if (videoRef.current?.paused) {
+                          videoRef.current.play();
+                          setIsPlaying(true);
+                        } else {
+                          videoRef.current?.pause();
+                          setIsPlaying(false);
+                        }
+                      }}
+                      onTimeUpdate={handleTimeUpdate}
+                      onPause={handlePause}
+                      onPlay={() => setIsPlaying(true)}
+                      onEnded={handleEnded}
+                    />
 
-                  {/* Buttons Row */}
-                  <div className="flex items-center justify-between text-white text-xs">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => {
-                          if (videoRef.current?.paused) {
-                            videoRef.current.play();
-                            setIsPlaying(true);
-                          } else {
-                            videoRef.current?.pause();
-                            setIsPlaying(false);
-                          }
-                        }}
-                        className="p-1 hover:text-purple-400 transition"
-                      >
-                        {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                      </button>
-
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => {
-                            if (videoRef.current) {
-                              videoRef.current.muted = !videoRef.current.muted;
-                              setIsMuted(videoRef.current.muted);
-                            }
-                          }}
-                          className="hover:text-purple-400"
-                        >
-                          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                        </button>
-                        <input
-                          type="range"
-                          min={0}
-                          max={1}
-                          step={0.05}
-                          value={isMuted ? 0 : volume}
-                          onChange={(e) => {
-                            const val = Number(e.target.value);
-                            setVolume(val);
-                            if (videoRef.current) {
-                              videoRef.current.volume = val;
-                              videoRef.current.muted = val === 0;
-                              setIsMuted(val === 0);
-                            }
-                          }}
-                          className="w-16 h-1 bg-gray-600 rounded appearance-none accent-purple-500 cursor-pointer"
-                        />
-                      </div>
-
-                      <span className="font-mono text-[11px] text-gray-300">
-                        {formatTime(currentTime)} / {formatTime(duration)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      {/* Playback speed selector */}
-                      <select
-                        value={playbackSpeed}
+                    {/* Custom Video Controls Bar */}
+                    <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-2">
+                      {/* Seek Bar */}
+                      <input
+                        type="range"
+                        min={0}
+                        max={duration || 100}
+                        value={currentTime}
                         onChange={(e) => {
-                          const speed = Number(e.target.value);
-                          setPlaybackSpeed(speed);
-                          if (videoRef.current) videoRef.current.playbackRate = speed;
+                          const val = Number(e.target.value);
+                          setCurrentTime(val);
+                          if (videoRef.current) videoRef.current.currentTime = val;
                         }}
-                        className="bg-black/60 border border-gray-700 text-[11px] font-mono rounded px-1.5 py-0.5 text-gray-200"
-                      >
-                        <option value={0.5}>0.5x</option>
-                        <option value={0.75}>0.75x</option>
-                        <option value={1}>1.0x</option>
-                        <option value={1.25}>1.25x</option>
-                        <option value={1.5}>1.5x</option>
-                        <option value={2}>2.0x</option>
-                      </select>
+                        className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                      />
 
-                      {/* Fullscreen */}
-                      <button
-                        onClick={() => {
-                          if (document.fullscreenElement) {
-                            document.exitFullscreen();
-                          } else {
-                            videoRef.current?.requestFullscreen();
-                          }
-                        }}
-                        className="hover:text-purple-400 transition"
-                      >
-                        <Maximize className="w-4 h-4" />
-                      </button>
+                      {/* Buttons Row */}
+                      <div className="flex items-center justify-between text-white text-xs">
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => {
+                              if (videoRef.current?.paused) {
+                                videoRef.current.play();
+                                setIsPlaying(true);
+                              } else {
+                                videoRef.current?.pause();
+                                setIsPlaying(false);
+                              }
+                            }}
+                            className="p-1 hover:text-purple-400 transition"
+                          >
+                            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                          </button>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => {
+                                if (videoRef.current) {
+                                  videoRef.current.muted = !videoRef.current.muted;
+                                  setIsMuted(videoRef.current.muted);
+                                }
+                              }}
+                              className="hover:text-purple-400"
+                            >
+                              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                            </button>
+                            <input
+                              type="range"
+                              min={0}
+                              max={1}
+                              step={0.05}
+                              value={isMuted ? 0 : volume}
+                              onChange={(e) => {
+                                const val = Number(e.target.value);
+                                setVolume(val);
+                                if (videoRef.current) {
+                                  videoRef.current.volume = val;
+                                  videoRef.current.muted = val === 0;
+                                  setIsMuted(val === 0);
+                                }
+                              }}
+                              className="w-16 h-1 bg-gray-600 rounded appearance-none accent-purple-500 cursor-pointer"
+                            />
+                          </div>
+
+                          <span className="font-mono text-[11px] text-gray-300">
+                            {formatTime(currentTime)} / {formatTime(duration)}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          {/* Playback speed selector */}
+                          <select
+                            value={playbackSpeed}
+                            onChange={(e) => {
+                              const speed = Number(e.target.value);
+                              setPlaybackSpeed(speed);
+                              if (videoRef.current) videoRef.current.playbackRate = speed;
+                            }}
+                            className="bg-black/60 border border-gray-700 text-[11px] font-mono rounded px-1.5 py-0.5 text-gray-200"
+                          >
+                            <option value={0.5}>0.5x</option>
+                            <option value={0.75}>0.75x</option>
+                            <option value={1}>1.0x</option>
+                            <option value={1.25}>1.25x</option>
+                            <option value={1.5}>1.5x</option>
+                            <option value={2}>2.0x</option>
+                          </select>
+
+                          {/* Fullscreen */}
+                          <button
+                            onClick={() => {
+                              if (document.fullscreenElement) {
+                                document.exitFullscreen();
+                              } else {
+                                videoRef.current?.requestFullscreen();
+                              }
+                            }}
+                            className="hover:text-purple-400 transition"
+                          >
+                            <Maximize className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center p-12 text-center">
+                    <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin mb-3" />
+                    <p className="text-xs text-neutral-400 font-bold">Loading curriculum video stream...</p>
                   </div>
-                </div>
+                )}
               </div>
             ) : currentLesson?.type === "pdf" ? (
               <div className="p-8 flex flex-col items-center justify-center min-h-[420px] text-center space-y-4">
@@ -891,7 +1018,21 @@ export default function LearningPlayerPage() {
               <h2 className="text-lg font-bold text-white">{currentLesson?.title}</h2>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Mark Complete Action Button for all lessons (Video, YouTube, Drive, PDF, Text) */}
+              <button
+                onClick={handleManualComplete}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-sm ${
+                  completedLessonIds.has(lessonId)
+                    ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                    : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/40"
+                }`}
+                title={completedLessonIds.has(lessonId) ? "Lesson marked as completed" : "Click to mark lesson complete and earn XP"}
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>{completedLessonIds.has(lessonId) ? "Completed" : "Mark Complete"}</span>
+              </button>
+
               <button
                 onClick={handleToggleBookmark}
                 className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition ${
@@ -912,6 +1053,32 @@ export default function LearningPlayerPage() {
                 )}
               </button>
 
+              {isYouTube && (
+                <a
+                  href={`https://www.youtube.com/watch?v=${finalYouTubeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 rounded-xl border border-gray-700 bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition"
+                  title="Open video on YouTube in new tab"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-red-500" />
+                  <span className="hidden sm:inline">Open in</span> YouTube
+                </a>
+              )}
+
+              {isGoogleDrive && finalGoogleDriveId && (
+                <a
+                  href={`https://drive.google.com/file/d/${finalGoogleDriveId}/view`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 rounded-xl border border-gray-700 bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition"
+                  title="Open video in Google Drive in new tab"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="hidden sm:inline">Open in</span> Drive
+                </a>
+              )}
+
               {getPreviousLesson() && (
                 <Link
                   href={`/learn/${courseSlug}/${getPreviousLesson()?.id}`}
@@ -931,6 +1098,58 @@ export default function LearningPlayerPage() {
               )}
             </div>
           </div>
+
+          {/* Gamification / Achievement Celebration Banner */}
+          {achievementToast && (
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-950 via-indigo-950 to-pink-950 border border-purple-500/40 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5 text-amber-300" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm flex items-center gap-2">
+                    <span>Lesson Complete!</span>
+                    {achievementToast.xp > 0 && (
+                      <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-xs font-mono font-bold">
+                        +{achievementToast.xp} XP
+                      </span>
+                    )}
+                  </h4>
+                  <p className="text-xs text-neutral-300">
+                    {achievementToast.moduleCompleted && "🏆 Module Complete! "}
+                    {achievementToast.badges.length > 0 && `Unlocked ${achievementToast.badges.length} Badge${achievementToast.badges.length > 1 ? "s" : ""}! `}
+                    {achievementToast.courseCompleted
+                      ? "🎓 100% Course Finished! Claim your verified certificate now!"
+                      : "Streak recorded & Leaderboard updated."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <Link
+                  href="/leaderboard"
+                  className="px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-xs font-semibold flex items-center gap-1 transition text-white"
+                >
+                  <Trophy className="w-3.5 h-3.5 text-amber-400" /> Leaderboard
+                </Link>
+                {achievementToast.courseCompleted && (
+                  <button
+                    onClick={handleClaimCertificate}
+                    disabled={certificateLoading}
+                    className="px-3 py-1.5 rounded-xl bg-amber-400 text-black font-extrabold text-xs shadow-lg hover:brightness-110 flex items-center gap-1 transition"
+                  >
+                    <Award className="w-3.5 h-3.5" /> Claim Certificate
+                  </button>
+                )}
+                <button
+                  onClick={() => setAchievementToast(null)}
+                  className="p-1.5 rounded-lg hover:bg-white/10 text-neutral-400 hover:text-white transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 2. TABS: Overview, Notes, Resources */}
           <div className="space-y-4">
@@ -1041,19 +1260,19 @@ export default function LearningPlayerPage() {
 
         {/* --------------------------------------------------------------------- */}
         {/* Right Sidebar: Curriculum Drawer */}
-        {/* --------------------------------------------------------------------- */}
+        {/* ----------------------------------------------------------------------- */}
         <aside
-          className={`fixed inset-y-14 right-0 z-30 w-80 bg-[#0d0f1a] border-l border-gray-800 flex flex-col justify-between transition-transform duration-300 lg:static ${
+          className={`fixed inset-y-14 right-0 z-30 w-80 bg-white dark:bg-black border-l border-neutral-200 dark:border-neutral-800 flex flex-col justify-between transition-transform duration-300 lg:static ${
             sidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
           }`}
         >
-          <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-purple-400" /> Course Curriculum
+          <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-black dark:text-white uppercase tracking-wider flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-black dark:text-white" /> Course Curriculum
             </h3>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-1 rounded text-gray-400 hover:text-white lg:hidden"
+              className="p-1 rounded text-neutral-500 hover:text-black dark:hover:text-white lg:hidden"
             >
               <X className="w-5 h-5" />
             </button>

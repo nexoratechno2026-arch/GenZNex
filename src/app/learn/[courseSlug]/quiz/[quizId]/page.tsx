@@ -175,9 +175,9 @@ export default function StudentQuizPage() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-[#07080f] text-white flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white flex flex-col items-center justify-center">
         <Loader2 className="w-10 h-10 text-amber-500 animate-spin mb-4" />
-        <p className="text-gray-400 font-mono text-sm">Preparing exam environment...</p>
+        <p className="text-neutral-500 dark:text-neutral-400 font-mono text-sm">Preparing exam environment...</p>
       </div>
     );
   }
@@ -187,8 +187,8 @@ export default function StudentQuizPage() {
   // ---------------------------------------------------------------------------
   if (quizResult) {
     return (
-      <div className="min-h-screen bg-[#07080f] text-white flex flex-col items-center justify-center p-6">
-        <div className="max-w-xl w-full glass-panel p-8 rounded-2xl border border-gray-800 text-center space-y-6">
+      <div className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white flex flex-col items-center justify-center p-6">
+        <div className="max-w-xl w-full bg-neutral-50 dark:bg-neutral-900 p-8 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-center space-y-6 shadow-sm">
           <div
             className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${
               quizResult.passed
@@ -266,21 +266,21 @@ export default function StudentQuizPage() {
   const answeredCount = Object.keys(responses).length;
 
   return (
-    <div className="min-h-screen bg-[#07080f] text-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white flex flex-col">
       {/* Top Header */}
-      <header className="h-16 border-b border-gray-800 bg-[#0d0f1a] px-6 flex items-center justify-between z-10 shrink-0">
+      <header className="h-16 border-b border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md px-6 flex items-center justify-between z-10 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href={`/learn/${courseSlug}`}
-            className="p-1.5 rounded-lg bg-gray-800/60 hover:bg-gray-700 text-gray-400 hover:text-white transition"
+            className="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div>
-            <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider block">
+            <span className="text-[10px] font-mono text-amber-500 font-bold uppercase tracking-wider block">
               QUIZ ASSESSMENT
             </span>
-            <h1 className="text-xs sm:text-sm font-bold text-white truncate max-w-xs sm:max-w-md">
+            <h1 className="text-xs sm:text-sm font-bold text-neutral-900 dark:text-white truncate max-w-xs sm:max-w-md">
               {quizTitle}
             </h1>
           </div>
@@ -292,8 +292,8 @@ export default function StudentQuizPage() {
             <div
               className={`px-3 py-1.5 rounded-xl border flex items-center gap-2 text-xs font-mono font-bold ${
                 remainingSeconds < 120
-                  ? "bg-red-500/10 border-red-500/40 text-red-400 animate-pulse"
-                  : "bg-gray-800/60 border-gray-700 text-gray-300"
+                  ? "bg-red-500/10 border-red-500/40 text-red-500 animate-pulse"
+                  : "bg-neutral-100 dark:bg-neutral-800/60 border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300"
               }`}
             >
               <Clock className="w-4 h-4" /> {formatTimer(remainingSeconds)}
@@ -302,7 +302,7 @@ export default function StudentQuizPage() {
 
           <button
             onClick={() => setShowSubmitModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition"
+            className="btn-primary px-4 py-2 font-bold text-xs rounded-xl shadow-md transition"
           >
             Submit Quiz
           </button>
@@ -313,7 +313,7 @@ export default function StudentQuizPage() {
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between space-y-6">
         {/* Progress & Question Navigator */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs text-gray-400">
+          <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
             <span>
               Question <strong>{currentIndex + 1}</strong> of {questions.length}
             </span>
@@ -333,10 +333,10 @@ export default function StudentQuizPage() {
                   onClick={() => setCurrentIndex(idx)}
                   className={`w-8 h-8 rounded-lg text-xs font-mono font-bold transition flex items-center justify-center shrink-0 ${
                     isCurrent
-                      ? "bg-purple-600 text-white ring-2 ring-purple-400"
+                      ? "bg-violet-600 text-white ring-2 ring-violet-400"
                       : isAnswered
-                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                      : "bg-gray-800/80 text-gray-400 hover:bg-gray-700"
+                      ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                      : "bg-neutral-100 dark:bg-neutral-800/80 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                   }`}
                 >
                   {idx + 1}
@@ -348,14 +348,14 @@ export default function StudentQuizPage() {
 
         {/* Question Card */}
         {currentQ && (
-          <div className="p-6 sm:p-8 rounded-2xl glass-panel border border-gray-800 space-y-6">
+          <div className="p-6 sm:p-8 rounded-2xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-6 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
+              <span className="text-xs font-mono font-bold text-amber-500 uppercase tracking-wider">
                 {currentQ.type.replace("_", " ").toUpperCase()} • {currentQ.points} PTS
               </span>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-white leading-relaxed">
+            <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white leading-relaxed">
               {currentQ.text}
             </h3>
 
@@ -371,14 +371,14 @@ export default function StudentQuizPage() {
                       onClick={() => handleSelectAnswer(currentQ.id, optIdx)}
                       className={`w-full p-4 rounded-xl text-left text-sm flex items-center justify-between border transition ${
                         isSelected
-                          ? "bg-purple-600/20 border-purple-500 text-purple-200 font-semibold"
-                          : "bg-gray-900/60 border-gray-800 text-gray-300 hover:bg-gray-800/60"
+                          ? "bg-violet-500/10 border-violet-500 text-violet-700 dark:text-violet-200 font-semibold"
+                          : "bg-white dark:bg-neutral-950/60 border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/60"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                            isSelected ? "border-purple-400 bg-purple-500 text-white" : "border-gray-600"
+                            isSelected ? "border-violet-500 bg-violet-600 text-white" : "border-neutral-300 dark:border-neutral-600"
                           }`}
                         >
                           {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
@@ -393,7 +393,7 @@ export default function StudentQuizPage() {
 
             {currentQ.type === "mcq_multi" && (
               <div className="space-y-2.5">
-                <p className="text-xs text-purple-300 italic">Select all options that apply:</p>
+                <p className="text-xs text-violet-600 dark:text-violet-300 italic">Select all options that apply:</p>
                 {(currentQ.options || []).map((opt: string, optIdx: number) => {
                   const selectedIndices: number[] = Array.isArray(responses[currentQ.id])
                     ? responses[currentQ.id]
@@ -407,14 +407,14 @@ export default function StudentQuizPage() {
                       onClick={() => handleToggleMulti(currentQ.id, optIdx)}
                       className={`w-full p-4 rounded-xl text-left text-sm flex items-center justify-between border transition ${
                         isSelected
-                          ? "bg-purple-600/20 border-purple-500 text-purple-200 font-semibold"
-                          : "bg-gray-900/60 border-gray-800 text-gray-300 hover:bg-gray-800/60"
+                          ? "bg-violet-500/10 border-violet-500 text-violet-700 dark:text-violet-200 font-semibold"
+                          : "bg-white dark:bg-neutral-950/60 border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/60"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-5 h-5 rounded border flex items-center justify-center ${
-                            isSelected ? "border-purple-400 bg-purple-500 text-white" : "border-gray-600"
+                            isSelected ? "border-violet-500 bg-violet-600 text-white" : "border-neutral-300 dark:border-neutral-600"
                           }`}
                         >
                           {isSelected && <Check className="w-3.5 h-3.5" />}
@@ -438,8 +438,8 @@ export default function StudentQuizPage() {
                       onClick={() => handleSelectAnswer(currentQ.id, val)}
                       className={`py-6 rounded-xl font-bold text-center border transition ${
                         isSelected
-                          ? "bg-purple-600/20 border-purple-500 text-purple-300"
-                          : "bg-gray-900/60 border-gray-800 text-gray-400 hover:bg-gray-800/60"
+                          ? "bg-violet-500/10 border-violet-500 text-violet-600 dark:text-violet-300"
+                          : "bg-white dark:bg-neutral-950/60 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800/60"
                       }`}
                     >
                       {val ? "TRUE" : "FALSE"}
@@ -456,7 +456,7 @@ export default function StudentQuizPage() {
                   value={responses[currentQ.id] || ""}
                   onChange={(e) => handleSelectAnswer(currentQ.id, e.target.value)}
                   placeholder="Type your answer here..."
-                  className="w-full p-4 bg-gray-900/80 border border-gray-800 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full p-4 bg-white dark:bg-neutral-950/80 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 text-sm focus:outline-none focus:border-violet-500"
                 />
               </div>
             )}
@@ -468,7 +468,7 @@ export default function StudentQuizPage() {
           <button
             onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
             disabled={currentIndex === 0}
-            className="px-4 py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 disabled:opacity-40 text-xs font-semibold flex items-center gap-1.5 transition"
+            className="px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-40 text-xs font-semibold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5 transition"
           >
             <ArrowLeft className="w-4 h-4" /> Previous
           </button>
@@ -476,14 +476,14 @@ export default function StudentQuizPage() {
           {currentIndex < questions.length - 1 ? (
             <button
               onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
-              className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 transition"
+              className="btn-primary px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition"
             >
               Next <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <button
               onClick={() => setShowSubmitModal(true)}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition shadow-lg"
+              className="btn-primary px-6 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-lg"
             >
               Review & Submit
             </button>
@@ -493,27 +493,27 @@ export default function StudentQuizPage() {
 
       {/* Confirmation Modal */}
       {showSubmitModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full glass-panel p-6 rounded-2xl border border-gray-800 text-center space-y-4">
-            <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-center space-y-4 shadow-2xl">
+            <div className="w-12 h-12 mx-auto rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
               <AlertTriangle className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold">Ready to Submit Exam?</h3>
-            <p className="text-xs text-gray-300">
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white">Ready to Submit Exam?</h3>
+            <p className="text-xs text-neutral-600 dark:text-neutral-300">
               You have answered <strong>{answeredCount}</strong> of <strong>{questions.length}</strong> questions.
               Once submitted, your answers will be graded server-side and recorded.
             </p>
             <div className="flex gap-2 justify-center pt-2">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold"
+                className="px-4 py-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-semibold"
               >
                 Back to Exam
               </button>
               <button
                 onClick={() => handleFinalSubmit(false)}
                 disabled={submitting}
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5"
+                className="btn-primary px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5"
               >
                 {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 Confirm & Submit

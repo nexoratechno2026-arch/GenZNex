@@ -2,7 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Building2, Mail, Phone, MapPin, Send, CheckCircle2, ShieldCheck, ArrowLeft, Loader2 } from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
+import { Button } from "@/components/ui/Button";
+import { Navbar } from "@/components/navigation/Navbar";
+import { Footer } from "@/components/navigation/Footer";
 
 export default function ContactUsPage() {
   const [form, setForm] = useState({
@@ -18,7 +21,6 @@ export default function ContactUsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Bot check: If honeypot filled, silently drop
     if (form.honeyPot) {
       setSubmitted(true);
       return;
@@ -33,7 +35,6 @@ export default function ContactUsPage() {
     setError("");
 
     try {
-      // Simulate ticket generation / forward to support
       await new Promise((r) => setTimeout(r, 600));
       setSubmitted(true);
     } catch {
@@ -44,28 +45,28 @@ export default function ContactUsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-gray-200 py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto space-y-10">
-        
+    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col">
+      <Navbar />
+      <main className="flex-1 max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-10 w-full">
         {/* Back Link */}
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-xs font-semibold text-purple-400 hover:text-purple-300 transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <GoogleIcon name="arrow_back" size={16} />
           <span>Back to GenZNex Home</span>
         </Link>
 
         {/* Header */}
-        <div className="border-b border-gray-800 pb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/10 border border-purple-500/30 text-purple-400 mb-3">
-            <Building2 className="w-3.5 h-3.5" />
+        <div className="border-b border-neutral-200 dark:border-neutral-800 pb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-bold bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white mb-3">
+            <GoogleIcon name="apartment" size={16} />
             <span>Razorpay Regulatory Contact &amp; Support Portal</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-black dark:text-white tracking-tight">
             Contact Us &amp; Corporate Grievance
           </h1>
-          <p className="text-sm text-gray-400 mt-2">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
             Registered business details for learner assistance, invoice reconciliation, and payment inquiries.
           </p>
         </div>
@@ -74,12 +75,12 @@ export default function ContactUsPage() {
           
           {/* Left Column: Registered Business Information (Razorpay Mandatory) */}
           <div className="space-y-6">
-            <div className="p-6 rounded-2xl bg-[#141525] border border-gray-800 space-y-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-purple-400" />
+            <div className="p-6 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-4">
+              <h2 className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
+                <GoogleIcon name="apartment" size={20} />
                 <span>Corporate Identification</span>
               </h2>
-              <div className="text-xs text-gray-300 space-y-2 leading-relaxed">
+              <div className="text-xs text-neutral-600 dark:text-neutral-400 space-y-2 leading-relaxed">
                 <p><strong>Legal Entity:</strong> GenZNex EdTech Private Limited</p>
                 <p><strong>Corporate Identity Number (CIN):</strong> U80900DL2026PTC998877</p>
                 <p><strong>GST Identification Number (GSTIN):</strong> 07AABCU9603R1ZM</p>
@@ -87,85 +88,83 @@ export default function ContactUsPage() {
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-[#141525] border border-gray-800 space-y-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-cyan-400" />
+            <div className="p-6 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-4">
+              <h2 className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
+                <GoogleIcon name="location_on" size={20} />
                 <span>Office Location &amp; Hours</span>
               </h2>
-              <div className="text-xs text-gray-300 space-y-2 leading-relaxed">
-                <p><strong>Registered &amp; Corporate Headquarters:</strong></p>
-                <p className="text-gray-400">
+              <div className="text-xs text-neutral-600 dark:text-neutral-400 space-y-2 leading-relaxed">
+                <p className="font-bold text-black dark:text-white">Registered &amp; Corporate Headquarters:</p>
+                <p>
                   241, East Permanur, Anna Park Backside,<br />
                   Salem - 636007, Tamil Nadu, India.
                 </p>
-                <p className="mt-3"><strong>Operational Support Window:</strong></p>
-                <p className="text-gray-400">Monday to Saturday: 09:30 AM to 06:30 PM IST</p>
+                <p className="mt-3 font-bold text-black dark:text-white">Operational Support Window:</p>
+                <p>Monday to Saturday: 09:30 AM to 06:30 PM IST</p>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-[#141525] border border-gray-800 space-y-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Mail className="w-5 h-5 text-emerald-400" />
+            <div className="p-6 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-4">
+              <h2 className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
+                <GoogleIcon name="mail" size={20} />
                 <span>Direct Contact Channels</span>
               </h2>
-              <div className="text-xs text-gray-300 space-y-2 leading-relaxed">
-                <p className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-500" />
-                  <strong>Learner Support:</strong>
-                  <a href="mailto:support@genznex.in" className="text-purple-400 hover:underline">support@genznex.in</a>
-                </p>
-                <p className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-500" />
-                  <strong>Refunds &amp; Billing:</strong>
-                  <a href="mailto:refunds@genznex.in" className="text-purple-400 hover:underline">refunds@genznex.in</a>
-                </p>
-                <p className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gray-500" />
-                  <strong>Direct Helpline:</strong>
-                  <span className="text-white">+91 124 456 7890</span>
-                </p>
+              <div className="text-xs text-neutral-600 dark:text-neutral-400 space-y-3 leading-relaxed">
+                <div className="flex items-center gap-2">
+                  <GoogleIcon name="mail" size={16} />
+                  <span>support@genznex.in (Response within 24h)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <GoogleIcon name="call" size={16} />
+                  <span>+91 427 241 7000 (Mon-Sat, 9:30 AM - 6:30 PM)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <GoogleIcon name="verified_user" size={16} />
+                  <span>Grievance Officer: grievance@genznex.in</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Interactive Spam-Protected Inquiry Form */}
-          <div className="p-6 rounded-2xl bg-[#121422] border border-purple-500/20">
+          {/* Right Column: Support Form */}
+          <div className="p-6 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-6">
+            <div>
+              <h2 className="text-lg font-bold text-black dark:text-white">Send Us a Direct Message</h2>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                Fill in the details below and our team will get back to you shortly.
+              </p>
+            </div>
+
             {submitted ? (
-              <div className="text-center py-12 space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <h3 className="text-xl font-bold text-white">Inquiry Received</h3>
-                <p className="text-xs text-gray-400 max-w-sm mx-auto leading-relaxed">
-                  Thank you for reaching out. Ticket reference <strong>#{Math.floor(100000 + Math.random() * 900000)}</strong> has been opened. Our support desk will reply to {form.email} within 24 business hours.
+              <div className="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-black p-6 text-center space-y-3">
+                <GoogleIcon name="check_circle" size={40} className="mx-auto" />
+                <h3 className="text-base font-bold text-black dark:text-white">Message Dispatched Successfully</h3>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                  Thank you for reaching out. A support coordinator will respond to {form.email} within 24 business hours.
                 </p>
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => {
                     setSubmitted(false);
                     setForm({ name: "", email: "", subject: "support", message: "", honeyPot: "" });
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-gray-800 text-gray-200 hover:bg-gray-700 transition-colors"
                 >
                   Send Another Message
-                </button>
+                </Button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <h3 className="text-lg font-bold text-white">Send an Inquiry or Grievance</h3>
-                <p className="text-xs text-gray-400">
-                  Fill in your details below and our operations desk will assist you promptly.
-                </p>
-
                 {error && (
-                  <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
-                    {error}
+                  <div className="rounded-md border border-neutral-400 bg-white dark:bg-black p-3 text-xs text-black dark:text-white flex items-center gap-2">
+                    <GoogleIcon name="error" size={16} />
+                    <span>{error}</span>
                   </div>
                 )}
 
-                {/* Honeypot field for bot protection */}
                 <input
                   type="text"
-                  name="user_organization_hp"
+                  name="honeyPot"
                   value={form.honeyPot}
                   onChange={(e) => setForm({ ...form, honeyPot: e.target.value })}
                   style={{ display: "none" }}
@@ -174,35 +173,35 @@ export default function ContactUsPage() {
                 />
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-300 mb-1">Your Full Name *</label>
+                  <label className="block text-xs font-bold text-black dark:text-white mb-1">Your Full Name *</label>
                   <input
                     type="text"
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="Rahul Sharma"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#090a0f] border border-gray-700 focus:border-purple-500 text-white text-xs outline-none transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white text-xs outline-none focus:border-black dark:focus:border-white transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-300 mb-1">Email Address *</label>
+                  <label className="block text-xs font-bold text-black dark:text-white mb-1">Email Address *</label>
                   <input
                     type="email"
                     required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="rahul@example.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#090a0f] border border-gray-700 focus:border-purple-500 text-white text-xs outline-none transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white text-xs outline-none focus:border-black dark:focus:border-white transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-300 mb-1">Category *</label>
+                  <label className="block text-xs font-bold text-black dark:text-white mb-1">Category *</label>
                   <select
                     value={form.subject}
                     onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#090a0f] border border-gray-700 focus:border-purple-500 text-white text-xs outline-none transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white text-xs outline-none focus:border-black dark:focus:border-white transition-colors"
                   >
                     <option value="support">Course Access &amp; Learning Support</option>
                     <option value="billing">Billing, Invoices &amp; Razorpay Payments</option>
@@ -213,37 +212,29 @@ export default function ContactUsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-300 mb-1">Detailed Message *</label>
+                  <label className="block text-xs font-bold text-black dark:text-white mb-1">Detailed Message *</label>
                   <textarea
                     rows={4}
                     required
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     placeholder="Please include course name or Razorpay Payment ID if applicable..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#090a0f] border border-gray-700 focus:border-purple-500 text-white text-xs outline-none transition-colors resize-none"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white text-xs outline-none focus:border-black dark:focus:border-white transition-colors resize-none"
                   />
                 </div>
 
-                <button
+                <Button
+                  variant="primary"
                   type="submit"
-                  disabled={loading}
-                  className="w-full py-2.5 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white transition-all shadow-md shadow-purple-600/30 flex items-center justify-center gap-2 disabled:opacity-50"
+                  fullWidth
+                  loading={loading}
+                  rightIcon={<GoogleIcon name="send" size={16} />}
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Transmitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      <span>Submit Inquiry</span>
-                    </>
-                  )}
-                </button>
+                  Submit Inquiry
+                </Button>
 
-                <div className="flex items-center justify-center gap-1.5 text-[11px] text-gray-500 pt-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="flex items-center justify-center gap-1.5 text-[11px] text-neutral-500 pt-2">
+                  <GoogleIcon name="verified_user" size={14} />
                   <span>Protected by zero-PII anti-spam heuristics</span>
                 </div>
               </form>
@@ -252,7 +243,8 @@ export default function ContactUsPage() {
 
         </div>
 
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }

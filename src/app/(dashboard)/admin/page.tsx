@@ -25,14 +25,14 @@ const ADMIN_MODULES: AdminModuleCard[] = [
     description: "Review, approve, or reject instructor-submitted curriculum courses.",
     href: "/admin/courses",
     icon: "verified",
-    badge: "Curriculum Queue",
+    badge: "Curriculum",
   },
   {
     title: "Payments & Refunds",
     description: "Inspect Razorpay transactions, audit trail, and trigger refunds.",
     href: "/admin/payments",
     icon: "receipt_long",
-    badge: "Financial Audit",
+    badge: "Financial",
   },
   {
     title: "Revenue & Ledger",
@@ -50,31 +50,31 @@ const ADMIN_MODULES: AdminModuleCard[] = [
   },
   {
     title: "Platform Analytics",
-    description: "Real-time user enrollments, completion rates, and KPI summaries.",
+    description: "Real-time user enrollments, completion rates, and platform metrics.",
     href: "/admin/analytics",
     icon: "analytics",
     badge: "Telemetry",
   },
   {
-    title: "Training Programs",
-    description: "Manage live bootcamps, cohort batches, and live sessions.",
+    title: "Curriculum Cohorts",
+    description: "Manage cohort syllabus, sprint tracks, and schedule timelines.",
     href: "/programs",
-    icon: "rocket_launch",
-    badge: "Bootcamps",
+    icon: "layers",
+    badge: "Cohorts",
   },
   {
-    title: "Placement Pipeline",
-    description: "Manage corporate job postings, student applications, and resumes.",
+    title: "Job Opportunities",
+    description: "Manage tech job listings, referral links, and student applications.",
     href: "/jobs",
     icon: "work",
-    badge: "Careers Desk",
+    badge: "Careers",
   },
   {
     title: "System Health API",
     description: "Probe database connectivity, function uptime, and microservice status.",
     href: "/api/health",
     icon: "monitor_heart",
-    badge: "Uptime Probe",
+    badge: "Uptime",
   },
 ];
 
@@ -113,26 +113,26 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="space-y-8" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
+    <div className="space-y-8 animate-in fade-in duration-150">
       
       {/* Top Banner */}
-      <div className="p-6 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 sm:p-7 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-black text-white dark:bg-white dark:text-black mb-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 mb-2">
             <GoogleIcon name="shield" size={13} />
             <span>Administrator Control Center</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-black dark:text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
             Executive Operations Desk, {adminName}
           </h1>
-          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1">
             Manage system-wide permissions, verify trainer course submissions, and monitor financial transactions.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold px-3 py-1.5 rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-black text-black dark:text-white flex items-center gap-1.5">
-            <GoogleIcon name="lock" size={14} />
+          <span className="text-xs font-bold px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white flex items-center gap-1.5 shadow-sm">
+            <GoogleIcon name="lock" size={14} className="text-violet-600 dark:text-violet-400" />
             <span>RBAC Active</span>
           </span>
         </div>
@@ -141,7 +141,7 @@ export default function AdminDashboardPage() {
       {/* Connected Admin Modules Grid */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white flex items-center gap-1.5">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 dark:text-white flex items-center gap-1.5">
             <GoogleIcon name="apps" size={16} />
             <span>Connected Administrative Routes</span>
           </h2>
@@ -153,18 +153,18 @@ export default function AdminDashboardPage() {
             <Link
               key={mod.href}
               href={mod.href}
-              className="p-5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black hover:border-black dark:hover:border-white transition flex flex-col justify-between group shadow-sm"
+              className="p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 hover:border-neutral-400 dark:hover:border-neutral-600 transition-all hover:shadow-sm flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-md bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 flex items-center justify-center text-black dark:text-white">
-                    <GoogleIcon name={mod.icon} size={22} />
+                  <div className="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-900 dark:text-white group-hover:scale-105 transition-transform">
+                    <GoogleIcon name={mod.icon} size={20} />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-800">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
                     {mod.badge}
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-black dark:text-white group-hover:underline">
+                <h3 className="text-sm font-bold text-neutral-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                   {mod.title}
                 </h3>
                 <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1.5 line-clamp-2">
@@ -172,9 +172,9 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between text-xs font-bold text-black dark:text-white">
+              <div className="pt-4 mt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between text-xs font-bold text-neutral-900 dark:text-white">
                 <span>Access Module</span>
-                <GoogleIcon name="arrow_forward" size={14} />
+                <GoogleIcon name="arrow_forward" size={14} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>
           ))}
@@ -186,10 +186,10 @@ export default function AdminDashboardPage() {
         
         {/* Left: Role Assignment Tool */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
+          <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 rounded-2xl shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base text-black dark:text-white flex items-center gap-2">
-                <GoogleIcon name="key" size={18} />
+              <CardTitle className="text-base text-neutral-900 dark:text-white flex items-center gap-2">
+                <GoogleIcon name="key" size={18} className="text-violet-600 dark:text-violet-400" />
                 <span>Assign Custom Claims (RBAC Engine)</span>
               </CardTitle>
               <CardDescription className="text-xs text-neutral-600 dark:text-neutral-400">
@@ -198,14 +198,14 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               {successMsg && (
-                <div className="mb-4 p-3 rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white text-xs font-bold flex items-center gap-2">
+                <div className="mb-4 p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2">
                   <GoogleIcon name="check_circle" size={16} />
                   <span>{successMsg}</span>
                 </div>
               )}
 
               {errorMsg && (
-                <div className="mb-4 p-3 rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white text-xs font-bold flex items-center gap-2">
+                <div className="mb-4 p-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-800 dark:text-rose-300 text-xs font-bold flex items-center gap-2">
                   <GoogleIcon name="error" size={16} />
                   <span>{errorMsg}</span>
                 </div>
@@ -223,7 +223,7 @@ export default function AdminDashboardPage() {
                 />
 
                 <div>
-                  <label className="block text-xs font-bold text-black dark:text-white uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wider mb-2">
                     Select Role Claim
                   </label>
                   <div className="grid grid-cols-3 gap-3">
@@ -232,10 +232,10 @@ export default function AdminDashboardPage() {
                         key={r}
                         type="button"
                         onClick={() => setTargetRole(r)}
-                        className={`p-3 rounded border text-xs font-bold capitalize transition-all ${
+                        className={`p-3 rounded-xl border text-xs font-bold capitalize transition-all cursor-pointer ${
                           targetRole === r
-                            ? "bg-black text-white dark:bg-white dark:text-black border-black dark:border-white"
-                            : "bg-white dark:bg-black text-neutral-600 dark:text-neutral-400 border-neutral-300 dark:border-neutral-800 hover:border-black dark:hover:border-white"
+                            ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 border-neutral-900 dark:border-white shadow-sm"
+                            : "bg-neutral-50 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600"
                         }`}
                       >
                         {r}
@@ -249,7 +249,7 @@ export default function AdminDashboardPage() {
                   type="submit"
                   variant="primary"
                   loading={assigning}
-                  className="bg-black text-white dark:bg-white dark:text-black hover:opacity-90"
+                  className="rounded-xl px-5 py-2.5"
                 >
                   Apply Role Claim
                 </Button>
@@ -260,10 +260,10 @@ export default function AdminDashboardPage() {
 
         {/* Right: Security Matrix & Pre-configured Accounts */}
         <div className="space-y-6">
-          <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
+          <Card className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 rounded-2xl shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base text-black dark:text-white flex items-center gap-2">
-                <GoogleIcon name="badge" size={18} />
+              <CardTitle className="text-base text-neutral-900 dark:text-white flex items-center gap-2">
+                <GoogleIcon name="badge" size={18} className="text-amber-500" />
                 <span>Default Test Accounts</span>
               </CardTitle>
               <CardDescription className="text-xs text-neutral-600 dark:text-neutral-400">
@@ -271,28 +271,28 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
-              <div className="p-3 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 space-y-1">
-                <div className="font-bold text-black dark:text-white flex items-center justify-between">
+              <div className="p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/60 space-y-1">
+                <div className="font-bold text-neutral-900 dark:text-white flex items-center justify-between">
                   <span>Super Admin</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-black text-white dark:bg-white dark:text-black uppercase">admin</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 uppercase font-bold">admin</span>
                 </div>
                 <div className="text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">admin@genznex.in</div>
                 <div className="text-neutral-500 font-mono text-[10px]">Pass: Password@123</div>
               </div>
 
-              <div className="p-3 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 space-y-1">
-                <div className="font-bold text-black dark:text-white flex items-center justify-between">
+              <div className="p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/60 space-y-1">
+                <div className="font-bold text-neutral-900 dark:text-white flex items-center justify-between">
                   <span>Instructor</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-black text-white dark:bg-white dark:text-black uppercase">trainer</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 uppercase font-bold">trainer</span>
                 </div>
                 <div className="text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">vikram@genznex.in</div>
                 <div className="text-neutral-500 font-mono text-[10px]">Pass: Password@123</div>
               </div>
 
-              <div className="p-3 rounded border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 space-y-1">
-                <div className="font-bold text-black dark:text-white flex items-center justify-between">
+              <div className="p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/60 space-y-1">
+                <div className="font-bold text-neutral-900 dark:text-white flex items-center justify-between">
                   <span>Student</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-black text-white dark:bg-white dark:text-black uppercase">student</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 uppercase font-bold">student</span>
                 </div>
                 <div className="text-neutral-600 dark:text-neutral-400 font-mono text-[11px]">student@genznex.in</div>
                 <div className="text-neutral-500 font-mono text-[10px]">Pass: Password@123</div>

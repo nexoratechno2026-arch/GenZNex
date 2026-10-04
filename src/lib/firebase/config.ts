@@ -10,7 +10,9 @@ export const firebaseConfig = {
 export const emulatorConfig = {
   useEmulator:
     process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true" ||
-    process.env.NODE_ENV === "development",
+    process.env.NODE_ENV === "development" ||
+    (process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "").startsWith("demo-") ||
+    process.env.NODE_ENV !== "production",
   authUrl: process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_URL || "http://127.0.0.1:9099",
   firestoreHost: process.env.NEXT_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_HOST || "127.0.0.1",
   firestorePort: Number(process.env.NEXT_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT) || 8080,

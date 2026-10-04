@@ -162,15 +162,11 @@ function CourseCatalogContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded border border-neutral-300 dark:border-neutral-700 text-xs font-bold mb-3 text-neutral-800 dark:text-neutral-200">
-                <GoogleIcon name="school" size={16} />
-                <span>Next-Gen Career Programs</span>
-              </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-black dark:text-white">
                 Course Catalog
               </h1>
               <p className="mt-2 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 max-w-2xl">
-                Hands-on engineering tracks designed for developers in India. High-impact curriculum, real-world projects, and placement assistance.
+                Hands-on engineering tracks designed for students and developers. High-impact curriculum, real-world projects, and verifiable course certificates.
               </p>
             </div>
 
@@ -209,10 +205,10 @@ function CourseCatalogContent() {
                 setSelectedCategory("all");
                 updateURL({ category: null });
               }}
-              className={`rounded px-4 py-1.5 text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
+              className={`rounded-full px-5 py-2 text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
                 selectedCategory === "all"
-                  ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
-                  : "bg-white text-black border-neutral-300 hover:border-black dark:bg-black dark:text-white dark:border-neutral-800 dark:hover:border-neutral-600"
+                  ? "btn-primary shadow-md shadow-violet-500/20"
+                  : "bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border-neutral-200 dark:bg-neutral-900 dark:text-neutral-300 dark:border-neutral-800 dark:hover:bg-neutral-800"
               }`}
             >
               All Categories
@@ -224,10 +220,10 @@ function CourseCatalogContent() {
                   setSelectedCategory(cat.slug);
                   updateURL({ category: cat.slug });
                 }}
-                className={`rounded px-4 py-1.5 text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
+                className={`rounded-full px-5 py-2 text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
                   selectedCategory === cat.slug
-                    ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
-                    : "bg-white text-black border-neutral-300 hover:border-black dark:bg-black dark:text-white dark:border-neutral-800 dark:hover:border-neutral-600"
+                    ? "btn-primary shadow-md shadow-violet-500/20"
+                    : "bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border-neutral-200 dark:bg-neutral-900 dark:text-neutral-300 dark:border-neutral-800 dark:hover:bg-neutral-800"
                 }`}
               >
                 {cat.name}
@@ -307,13 +303,13 @@ function CourseCatalogContent() {
             {/* Pricing Filter */}
             <div>
               <h3 className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-2.5">Pricing</h3>
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {[
                   { id: "all", label: "All Pricing" },
                   { id: "free", label: "Free Courses" },
                   { id: "paid", label: "Paid Programs" },
                 ].map((item) => (
-                  <label key={item.id} className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white cursor-pointer py-1">
+                  <label key={item.id} className="flex items-center gap-3 text-xs text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white cursor-pointer py-1.5 select-none w-full">
                     <input
                       type="radio"
                       name="filter-price"
@@ -322,9 +318,9 @@ function CourseCatalogContent() {
                         setSelectedPrice(item.id as any);
                         updateURL({ price: item.id === "all" ? null : item.id });
                       }}
-                      className="accent-black dark:accent-white"
+                      className="accent-violet-600 w-4 h-4 cursor-pointer shrink-0 m-0"
                     />
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium whitespace-nowrap">{item.label}</span>
                   </label>
                 ))}
               </div>
@@ -333,13 +329,13 @@ function CourseCatalogContent() {
             {/* Language Filter */}
             <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
               <h3 className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-2.5">Language</h3>
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {[
                   { id: "all", label: "All Languages" },
                   { id: "English", label: "English" },
                   { id: "Tamil", label: "Tamil" },
                 ].map((item) => (
-                  <label key={item.id} className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white cursor-pointer py-1">
+                  <label key={item.id} className="flex items-center gap-3 text-xs text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white cursor-pointer py-1.5 select-none w-full">
                     <input
                       type="radio"
                       name="filter-language"
@@ -348,9 +344,9 @@ function CourseCatalogContent() {
                         setSelectedLanguage(item.id as any);
                         updateURL({ language: item.id === "all" ? null : item.id });
                       }}
-                      className="accent-black dark:accent-white"
+                      className="accent-violet-600 w-4 h-4 cursor-pointer shrink-0 m-0"
                     />
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium whitespace-nowrap">{item.label}</span>
                   </label>
                 ))}
               </div>
@@ -359,14 +355,14 @@ function CourseCatalogContent() {
             {/* Level Filter */}
             <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800">
               <h3 className="text-xs font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-wider mb-2.5">Level</h3>
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {[
                   { id: "all", label: "All Levels" },
                   { id: "beginner", label: "Beginner" },
                   { id: "intermediate", label: "Intermediate" },
                   { id: "advanced", label: "Advanced" },
                 ].map((item) => (
-                  <label key={item.id} className="flex items-center gap-2 text-xs text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white cursor-pointer py-1">
+                  <label key={item.id} className="flex items-center gap-3 text-xs text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white cursor-pointer py-1.5 select-none w-full">
                     <input
                       type="radio"
                       name="filter-level"
@@ -375,9 +371,9 @@ function CourseCatalogContent() {
                         setSelectedLevel(item.id as any);
                         updateURL({ level: item.id === "all" ? null : item.id });
                       }}
-                      className="accent-black dark:accent-white"
+                      className="accent-violet-600 w-4 h-4 cursor-pointer shrink-0 m-0"
                     />
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium whitespace-nowrap">{item.label}</span>
                   </label>
                 ))}
               </div>
@@ -395,15 +391,15 @@ function CourseCatalogContent() {
                 ))}
               </div>
             ) : (
-              <div className="rounded-lg border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-black p-12 text-center">
-                <GoogleIcon name="search_off" size={48} className="text-neutral-500 mb-3" />
-                <h3 className="text-base font-bold text-black dark:text-white">No Courses Found</h3>
+              <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 p-12 text-center">
+                <GoogleIcon name="search_off" size={48} className="text-neutral-400 mb-3" />
+                <h3 className="text-base font-bold text-neutral-900 dark:text-white">No Courses Found</h3>
                 <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 max-w-sm mx-auto">
                   We couldn&apos;t find any programs matching your selected criteria. Try adjusting your filters or search terms.
                 </p>
                 <button
                   onClick={handleResetFilters}
-                  className="mt-5 rounded border border-black bg-black text-white hover:bg-neutral-800 dark:border-white dark:bg-white dark:text-black dark:hover:bg-neutral-200 px-4 py-2 text-xs font-bold cursor-pointer"
+                  className="mt-5 btn-primary px-5 py-2.5 text-xs font-bold rounded-xl cursor-pointer"
                 >
                   Clear All Filters
                 </button>

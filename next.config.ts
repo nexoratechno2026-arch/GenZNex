@@ -5,9 +5,9 @@ const cspHeader = `
   script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://*.razorpay.com https://www.googletagmanager.com https://apis.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com data:;
-  img-src 'self' data: blob: https://*.googleusercontent.com https://images.unsplash.com https://*.razorpay.com https://firebasestorage.googleapis.com;
+  img-src 'self' data: blob: https://*.googleusercontent.com https://images.unsplash.com https://*.razorpay.com https://firebasestorage.googleapis.com https://img.youtube.com https://i.ytimg.com https://*.ytimg.com;
   connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://api.razorpay.com https://*.razorpay.com https://www.google-analytics.com https://*.ingest.sentry.io http://127.0.0.1:* ws://127.0.0.1:* http://localhost:* ws://localhost:*;
-  frame-src 'self' https://api.razorpay.com https://*.razorpay.com https://www.google.com/recaptcha/ https://player.vimeo.com https://stream.mux.com;
+  frame-src 'self' https://api.razorpay.com https://*.razorpay.com https://www.google.com/recaptcha/ https://player.vimeo.com https://stream.mux.com https://www.youtube.com https://www.youtube-nocookie.com https://*.youtube.com https://iframe.mediadelivery.net https://drive.google.com https://docs.google.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self' https://api.razorpay.com;
@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "firebasestorage.googleapis.com" },
       { protocol: "https", hostname: "*.googleusercontent.com" },
       { protocol: "https", hostname: "*.razorpay.com" },
+      { protocol: "https", hostname: "img.youtube.com" },
+      { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "*.ytimg.com" },
     ],
   },
   async headers() {

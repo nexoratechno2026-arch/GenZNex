@@ -2,25 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { 
-  Plus, 
-  BookOpen, 
-  Clock, 
-  Send, 
-  Edit3, 
-  Eye, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Sparkles,
-  Search,
-  Filter,
-  RefreshCw
-} from "lucide-react";
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import Image from "next/image";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 import { db, functions } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/context/AuthContext";
 import { CourseDoc, CourseStatus } from "@/types/schema";
+import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/components/courses/CourseCard";
 
 export default function TrainerCoursesPage() {
@@ -36,7 +25,6 @@ export default function TrainerCoursesPage() {
     setLoading(true);
     try {
       const coursesCol = collection(db, "courses");
-      // Query courses where trainerId == user.uid
       const q = query(coursesCol, where("trainerId", "==", user.uid));
       const snapshot = await getDocs(q);
 
@@ -56,7 +44,6 @@ export default function TrainerCoursesPage() {
     fetchTrainerCourses();
   }, [user]);
 
-  // Handle submit for review
   const handleSubmitForReview = async (courseId: string) => {
     setSubmittingId(courseId);
     setActionMessage(null);
@@ -67,7 +54,6 @@ export default function TrainerCoursesPage() {
         type: "success",
         text: "Course submitted for admin review successfully!",
       });
-      // Refresh list
       await fetchTrainerCourses();
     } catch (err: any) {
       console.error("Failed to submit course for review:", err);
@@ -87,72 +73,53 @@ export default function TrainerCoursesPage() {
   const getStatusBadge = (status: CourseStatus) => {
     switch (status) {
       case "published":
-        return <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Published</span>;
+        return <span className="rounded px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-black text-white dark:bg-white dark:text-black">Published</span>;
       case "pending_review":
-        return <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-400 border border-amber-500/20">Pending Review</span>;
+        return <span className="rounded px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider border border-neutral-400 dark:border-neutral-600 text-black dark:text-white">In Review</span>;
       case "rejected":
-        return <span className="rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-semibold text-rose-400 border border-rose-500/20">Rejected</span>;
+        return <span className="rounded px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white border border-neutral-300 dark:border-neutral-700">Rejected</span>;
       case "draft":
       default:
-        return <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs font-semibold text-zinc-400 border border-zinc-700">Draft</span>;
+        return <span className="rounded px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider border border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">Draft</span>;
     }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl border border-zinc-800 bg-gradient-to-r from-purple-950/30 via-zinc-950/60 to-transparent backdrop-blur-xl">
+    <div className="space-y-6 animate-in fade-in duration-150">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-400 text-xs font-semibold mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Curriculum Management</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            My Courses Studio
-          </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Build, edit modules, and submit courses for admin approval.
+          <h1 className="text-2xl font-bold tracking-tight text-black dark:text-white">Course Management</h1>
+          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 font-medium">
+            Draft, edit, and publish your industry-ready courses and curriculum.
           </p>
         </div>
 
-        <Link
-          href="/trainer/courses/new"
-          id="btn-create-course"
-          className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-violet-600/30 hover:bg-violet-500 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Create New Course</span>
+        <Link href="/trainer/courses/new">
+          <Button variant="primary" size="sm" leftIcon={<GoogleIcon name="add" size={16} />}>
+            Create New Course
+          </Button>
         </Link>
       </div>
 
-      {/* Action Messages */}
+      {/* Action Notification Alert */}
       {actionMessage && (
-        <div
-          className={`rounded-xl p-4 text-xs flex items-center justify-between ${
-            actionMessage.type === "success"
-              ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-300"
-              : "bg-rose-500/10 border border-rose-500/30 text-rose-300"
-          }`}
-        >
+        <div className="rounded-lg p-3.5 text-xs font-bold border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {actionMessage.type === "success" ? (
-              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-            ) : (
-              <AlertTriangle className="h-4 w-4 text-rose-400 shrink-0" />
-            )}
+            <GoogleIcon name={actionMessage.type === "success" ? "check_circle" : "error"} size={16} />
             <span>{actionMessage.text}</span>
           </div>
           <button
             onClick={() => setActionMessage(null)}
-            className="text-zinc-400 hover:text-white"
+            className="text-neutral-500 hover:text-black dark:hover:text-white cursor-pointer"
           >
-            ✕
+            <GoogleIcon name="close" size={14} />
           </button>
         </div>
       )}
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800/80 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-4">
         <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {[
             { id: "all", label: "All Courses" },
@@ -164,10 +131,10 @@ export default function TrainerCoursesPage() {
             <button
               key={tab.id}
               onClick={() => setFilterStatus(tab.id)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors ${
+              className={`rounded-md px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
                 filterStatus === tab.id
-                  ? "bg-violet-600 text-white shadow-sm"
-                  : "bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800"
+                  ? "bg-black text-white dark:bg-white dark:text-black shadow-sm"
+                  : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white border border-neutral-200 dark:border-neutral-800"
               }`}
             >
               {tab.label}
@@ -177,9 +144,9 @@ export default function TrainerCoursesPage() {
 
         <button
           onClick={fetchTrainerCourses}
-          className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white cursor-pointer"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
+          <GoogleIcon name="refresh" size={14} />
           <span>Refresh</span>
         </button>
       </div>
@@ -188,7 +155,7 @@ export default function TrainerCoursesPage() {
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-28 rounded-2xl bg-zinc-900/60 border border-zinc-800 animate-pulse" />
+            <div key={i} className="h-24 rounded-lg bg-neutral-100 dark:bg-neutral-900 animate-pulse border border-neutral-200 dark:border-neutral-800" />
           ))}
         </div>
       ) : filteredCourses.length > 0 ? (
@@ -196,28 +163,31 @@ export default function TrainerCoursesPage() {
           {filteredCourses.map((course) => (
             <div
               key={course.id}
-              className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5 backdrop-blur-md hover:border-zinc-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6"
+              className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-5 shadow-sm hover:border-black dark:hover:border-white transition-all flex flex-col md:flex-row md:items-center justify-between gap-6"
             >
               {/* Left Details */}
               <div className="flex items-start sm:items-center gap-4 flex-1">
-                <img
-                  src={course.thumbnailUrl || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&h=200&fit=crop"}
-                  alt={course.title}
-                  className="h-20 w-32 rounded-xl object-cover shrink-0 border border-zinc-800"
-                />
+                <div className="relative h-20 w-32 rounded-lg overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900">
+                  <Image
+                    src={course.thumbnailUrl || "/images/placeholder.jpg"}
+                    alt={course.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
 
                 <div className="space-y-1.5 flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     {getStatusBadge(course.status)}
-                    <span className="text-xs text-zinc-500">{course.categoryName || course.category}</span>
-                    <span className="text-xs text-zinc-500">•</span>
-                    <span className="text-xs text-zinc-500 capitalize">{course.level}</span>
+                    <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">{course.categoryName || course.category}</span>
+                    <span className="text-xs text-neutral-400">•</span>
+                    <span className="text-xs text-neutral-600 dark:text-neutral-400 capitalize font-medium">{course.level}</span>
                   </div>
 
-                  <h3 className="text-base font-bold text-white truncate">{course.title}</h3>
+                  <h3 className="text-base font-bold text-black dark:text-white truncate">{course.title}</h3>
 
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-400">
-                    <span className="font-semibold text-zinc-200">
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400 font-medium">
+                    <span className="font-bold text-black dark:text-white">
                       {formatPrice(course.priceInPaise)}
                     </span>
                     <span>{course.lessonCount || 0} lessons</span>
@@ -228,11 +198,11 @@ export default function TrainerCoursesPage() {
 
                   {/* Rejection Alert Box */}
                   {course.status === "rejected" && course.rejectionReason && (
-                    <div className="mt-3 rounded-xl border border-rose-500/30 bg-rose-950/20 p-3 text-xs text-rose-300">
+                    <div className="mt-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 p-3 text-xs text-black dark:text-white font-medium">
                       <div className="flex items-start gap-2">
-                        <AlertTriangle className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" />
+                        <GoogleIcon name="error" size={16} />
                         <div>
-                          <strong className="text-rose-200">Rejection Feedback: </strong>
+                          <strong>Rejection Feedback: </strong>
                           <span>{course.rejectionReason}</span>
                         </div>
                       </div>
@@ -244,55 +214,48 @@ export default function TrainerCoursesPage() {
               {/* Right Action Buttons */}
               <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 shrink-0 self-end md:self-center">
                 {/* Preview Link */}
-                <Link
-                  href={`/courses/${course.slug}`}
-                  target="_blank"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:border-zinc-700"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Preview</span>
+                <Link href={`/courses/${course.slug}`} target="_blank">
+                  <Button variant="outline" size="sm" leftIcon={<GoogleIcon name="visibility" size={14} />}>
+                    Preview
+                  </Button>
                 </Link>
 
                 {/* Edit Button */}
                 {(course.status === "draft" || course.status === "rejected") && (
-                  <Link
-                    href={`/trainer/courses/${course.id}/edit`}
-                    id={`btn-edit-${course.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-200 hover:border-violet-500 hover:text-violet-400"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>{course.status === "rejected" ? "Fix & Edit" : "Edit"}</span>
+                  <Link href={`/trainer/courses/${course.id}/edit`}>
+                    <Button variant="secondary" size="sm" leftIcon={<GoogleIcon name="edit" size={14} />}>
+                      {course.status === "rejected" ? "Fix & Edit" : "Edit"}
+                    </Button>
                   </Link>
                 )}
 
                 {/* Submit for Review Button */}
                 {(course.status === "draft" || course.status === "rejected") && (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    loading={submittingId === course.id}
                     onClick={() => handleSubmitForReview(course.id)}
-                    disabled={submittingId === course.id}
-                    id={`btn-submit-${course.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-violet-600/30 hover:bg-violet-500 disabled:opacity-50"
+                    leftIcon={submittingId !== course.id ? <GoogleIcon name="send" size={14} /> : undefined}
                   >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>{submittingId === course.id ? "Submitting..." : course.status === "rejected" ? "Resubmit" : "Submit for Review"}</span>
-                  </button>
+                    {submittingId === course.id ? "Submitting..." : course.status === "rejected" ? "Resubmit" : "Submit for Review"}
+                  </Button>
                 )}
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-12 text-center flex flex-col items-center justify-center">
-          <BookOpen className="h-10 w-10 text-zinc-500 mb-3" />
-          <h3 className="text-base font-bold text-white">No courses found</h3>
-          <p className="text-xs text-zinc-400 max-w-sm mt-1">
-            You don't have any courses matching the selected filter.
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-12 text-center flex flex-col items-center justify-center">
+          <GoogleIcon name="menu_book" size={36} className="text-neutral-400 mb-3" />
+          <h3 className="text-base font-bold text-black dark:text-white">No courses found</h3>
+          <p className="text-xs text-neutral-600 dark:text-neutral-400 max-w-sm mt-1 font-medium">
+            You don&apos;t have any courses matching the selected filter.
           </p>
-          <Link
-            href="/trainer/courses/new"
-            className="mt-4 rounded-xl bg-violet-600 px-4 py-2 text-xs font-semibold text-white hover:bg-violet-500"
-          >
-            Create Your First Course
+          <Link href="/trainer/courses/new" className="mt-4">
+            <Button variant="primary" size="sm">
+              Create Your First Course
+            </Button>
           </Link>
         </div>
       )}

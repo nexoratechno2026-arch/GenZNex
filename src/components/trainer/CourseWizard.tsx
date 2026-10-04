@@ -18,9 +18,13 @@ import {
   AlertCircle,
   Eye,
   ArrowLeft,
-  Upload
+  Upload,
+  X,
+  Tag,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
-import { doc, setDoc, getDoc, collection, getDocs, writeBatch, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, getDocs, addDoc, writeBatch, serverTimestamp } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 import { db, functions } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/context/AuthContext";
@@ -53,6 +57,15 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
   const [lastSaved, setLastSaved] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Category creation state
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryDesc, setNewCategoryDesc] = useState("");
+  const [savingCategory, setSavingCategory] = useState(false);
+
+  // Lesson expand/collapse
+  const [expandedLessons, setExpandedLessons] = useState<Set<string>>(new Set());
 
   // Form State
   const [title, setTitle] = useState("");
@@ -93,7 +106,7 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
     durationMinutes: number;
     isPreview: boolean;
     videoId?: string;
-    videoProvider?: "mux" | "bunny" | "vimeo" | "youtube";
+    videoProvider?: "mux" | "bunny" | "vimeo" | "youtube" | "googledrive";
     pdfUrl?: string;
     externalLink?: string;
   }
@@ -262,6 +275,11 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
             photoURL: userProfile?.photoURL || user.photoURL || "",
           },
           status: "draft",
+          isPublished: false,
+          enrollmentCount: 0,
+          rating: 5.0,
+          ratingCount: 0,
+          isFeatured: false,
           lessonCount: totalLessons,
           totalDurationMinutes: totalDuration,
           updatedAt: serverTimestamp(),
@@ -295,7 +313,9 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
             isPreview: les.isPreview,
             videoMetadata: les.type === "video" ? {
               provider: les.videoProvider || "youtube",
-              videoId: les.videoId || "demo_vid",
+              videoId: (les.videoId && les.videoId !== "intro_vid" && les.videoId !== "demo_vid" && les.videoId.trim() !== "")
+                ? les.videoId.trim()
+                : (promoVideoUrl || "dQw4w9WgXcQ"),
               durationSeconds: (les.durationMinutes || 10) * 60,
             } : undefined,
             pdfUrl: les.pdfUrl || "",
@@ -342,6 +362,47 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Add new category handler
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    setSavingCategory(true);
+    try {
+      const slug = newCategoryName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      const newCat: Omit<CategoryDoc, "id"> = {
+        name: newCategoryName.trim(),
+        slug,
+        description: newCategoryDesc.trim() || `Courses in ${newCategoryName.trim()}`,
+        courseCount: 0,
+        isActive: true,
+      } as any;
+      const ref = await addDoc(collection(db, "categories"), newCat);
+      const catWithId: CategoryDoc = { ...newCat, id: ref.id } as CategoryDoc;
+      setCategories((prev) => [...prev, catWithId]);
+      setCategory(slug);
+      setCategoryName(newCategoryName.trim());
+      setNewCategoryName("");
+      setNewCategoryDesc("");
+      setShowAddCategory(false);
+    } catch (err: any) {
+      console.error("Failed to create category:", err);
+    } finally {
+      setSavingCategory(false);
+    }
+  };
+
+  // Toggle lesson expand
+  const toggleLesson = (lesId: string) => {
+    setExpandedLessons((prev) => {
+      const next = new Set(prev);
+      if (next.has(lesId)) next.delete(lesId);
+      else next.add(lesId);
+      return next;
+    });
   };
 
   // Module & Lesson Handlers
@@ -607,7 +668,7 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
+              <div className="space-y-2">
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Category *</label>
                 <select
                   id="select-course-category"
@@ -625,6 +686,59 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
                     </option>
                   ))}
                 </select>
+
+                {/* Add New Category */}
+                {!showAddCategory ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCategory(true)}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-violet-400 hover:text-violet-300 transition-colors"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Add new category
+                  </button>
+                ) : (
+                  <div className="rounded-xl border border-violet-500/30 bg-violet-950/20 p-3 space-y-2.5 mt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-violet-300 uppercase tracking-wider">New Category</span>
+                      <button
+                        type="button"
+                        onClick={() => { setShowAddCategory(false); setNewCategoryName(""); setNewCategoryDesc(""); }}
+                        className="text-zinc-500 hover:text-zinc-300"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Category name (e.g. Cybersecurity)"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none"
+                      onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
+                      autoFocus
+                    />
+                    <input
+                      type="text"
+                      placeholder="Short description (optional)"
+                      value={newCategoryDesc}
+                      onChange={(e) => setNewCategoryDesc(e.target.value)}
+                      className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleAddCategory}
+                        disabled={!newCategoryName.trim() || savingCategory}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-violet-500 disabled:opacity-50 transition-colors"
+                      >
+                        <Tag className="h-3 w-3" />
+                        {savingCategory ? "Saving..." : "Create Category"}
+                      </button>
+                      <span className="text-[10px] text-zinc-500">Slug auto-generated from name</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -908,27 +1022,37 @@ export function CourseWizard({ initialCourseId }: CourseWizardProps) {
                               }}
                               className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-white"
                             >
-                              <option value="youtube">YouTube</option>
+                              <option value="youtube">YouTube (Unlisted / Embed)</option>
+                              <option value="googledrive">Google Drive (Share Link)</option>
                               <option value="mux">Mux Video</option>
                               <option value="bunny">Bunny CDN</option>
                               <option value="vimeo">Vimeo</option>
                             </select>
                           </div>
                           <div>
-                            <label className="block text-[10px] text-zinc-400 mb-1">Video ID / Key</label>
+                            <label className="block text-[10px] text-zinc-400 mb-1">
+                              {les.videoProvider === "googledrive" ? "Google Drive Share Link" : "Video ID or YouTube URL"}
+                            </label>
                             <input
                               type="text"
-                              placeholder="e.g. dQw4w9WgXcQ"
+                              placeholder={
+                                les.videoProvider === "googledrive"
+                                  ? "https://drive.google.com/file/d/.../view"
+                                  : "e.g. https://youtu.be/... or ID"
+                              }
                               value={les.videoId || ""}
                               onChange={(e) => {
                                 const vId = e.target.value;
+                                // Auto-switch provider if user pastes a drive link
+                                const isDrive = vId.includes("drive.google.com");
+                                const autoProv = isDrive ? "googledrive" : les.videoProvider || "youtube";
                                 setModules(
                                   modules.map((m) =>
                                     m.id === mod.id
                                       ? {
                                           ...m,
                                           lessons: m.lessons.map((l) =>
-                                            l.id === les.id ? { ...l, videoId: vId } : l
+                                            l.id === les.id ? { ...l, videoId: vId, videoProvider: autoProv } : l
                                           ),
                                         }
                                       : m

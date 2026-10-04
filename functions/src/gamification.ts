@@ -79,6 +79,7 @@ export function calculateLevelFromXp(totalXp: number): { level: number; name: st
 // Default XP rules in case Firestore config is empty
 export const DEFAULT_XP_RULES: Record<string, number> = {
   lesson_completed: 20,
+  module_completed: 50,
   quiz_passed: 50,
   quiz_perfect: 100,
   assignment_passed: 100,
@@ -254,6 +255,10 @@ export async function awardXp(
     if (eventType === "lesson_completed" && !earnedBadgeIds.includes("badge_first_lesson")) {
       newBadges.push("badge_first_lesson");
     }
+    // Rule: Module Master
+    if (eventType === "module_completed" && !earnedBadgeIds.includes("badge_module_master")) {
+      newBadges.push("badge_module_master");
+    }
     // Rule: 7-Day Streak
     if (currentStreak >= 7 && !earnedBadgeIds.includes("badge_streak_7")) {
       newBadges.push("badge_streak_7");
@@ -394,62 +399,7 @@ export const adminAdjustXp = onCall(async (request) => {
   return { success: true, targetUserId, xpDelta, reason };
 });
 
-/**
- * Fetch Leaderboard Snapshot
- */
-export const getLeaderboard = onCall(async (request) => {
-  const { scope = "alltime" } = z.object({
-    scope: z.enum(["weekly", "alltime"]).default("alltime"),
-  }).parse(request.data || {});
-
-  const snapshotDocId = scope === "weekly" ? "global_weekly" : "global_alltime";
-  const snap = await db.collection("leaderboard_snapshots").doc(snapshotDocId).get();
-
-  if (!snap.exists) {
-    return { rankings: [], generatedAt: null };
-  }
-
-  return snap.data();
-});
-
-// ---------------------------------------------------------------------------
-// Scheduled Tasks: Daily Streaks Maintenance & Leaderboard Snapshot Builder
-// ---------------------------------------------------------------------------
-
-/**
- * Runs daily at 00:05 IST (18:35 UTC) — resets broken learning streaks
- */
-export const streakDailyMaintenance = onSchedule("35 18 * * *", async () => {
-  const yesterdayIST = getYesterdayIST();
-
-  // Find all profiles whose lastActiveDate is older than yesterday
-  const profilesSnap = await db.collectionGroup("gamification")
-    .where("currentStreak", ">", 0)
-    .get();
-
-  const writeBatch = db.batch();
-  let updatedCount = 0;
-
-  for (const doc of profilesSnap.docs) {
-    const data = doc.data();
-    if (data.lastActiveDate && data.lastActiveDate < yesterdayIST) {
-      writeBatch.update(doc.ref, {
-        currentStreak: 0,
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-      updatedCount++;
-    }
-  }
-
-  if (updatedCount > 0) {
-    await writeBatch.commit();
-  }
-});
-
-/**
- * Runs every hour — builds top-N leaderboard snapshots
- */
-export const buildLeaderboardSnapshots = onSchedule("0 * * * *", async () => {
+export async function generateLeaderboardSnapshot() {
   // Query top 100 profiles ordered by totalXp DESC
   const profilesSnap = await db.collectionGroup("gamification")
     .orderBy("totalXp", "desc")
@@ -502,4 +452,71 @@ export const buildLeaderboardSnapshots = onSchedule("0 * * * *", async () => {
     rankings: rankings.slice(0, 20), // Top 20 for weekly
     generatedAt: FieldValue.serverTimestamp(),
   });
+
+  return rankings;
+}
+
+/**
+ * Fetch Leaderboard Snapshot
+ */
+export const getLeaderboard = onCall(async (request) => {
+  const { scope = "alltime" } = z.object({
+    scope: z.enum(["weekly", "alltime"]).default("alltime"),
+  }).parse(request.data || {});
+
+  const snapshotDocId = scope === "weekly" ? "global_weekly" : "global_alltime";
+  const snap = await db.collection("leaderboard_snapshots").doc(snapshotDocId).get();
+
+  if (!snap.exists || !(snap.data()?.rankings?.length > 0)) {
+    const rankings = await generateLeaderboardSnapshot();
+    return {
+      id: snapshotDocId,
+      type: scope,
+      rankings: scope === "weekly" ? rankings.slice(0, 20) : rankings,
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  return snap.data();
+});
+
+// ---------------------------------------------------------------------------
+// Scheduled Tasks: Daily Streaks Maintenance & Leaderboard Snapshot Builder
+// ---------------------------------------------------------------------------
+
+/**
+ * Runs daily at 00:05 IST (18:35 UTC) — resets broken learning streaks
+ */
+export const streakDailyMaintenance = onSchedule("35 18 * * *", async () => {
+  const yesterdayIST = getYesterdayIST();
+
+  // Find all profiles whose lastActiveDate is older than yesterday
+  const profilesSnap = await db.collectionGroup("gamification")
+    .where("currentStreak", ">", 0)
+    .get();
+
+  const writeBatch = db.batch();
+  let updatedCount = 0;
+
+  for (const doc of profilesSnap.docs) {
+    const data = doc.data();
+    if (data.lastActiveDate && data.lastActiveDate < yesterdayIST) {
+      writeBatch.update(doc.ref, {
+        currentStreak: 0,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      updatedCount++;
+    }
+  }
+
+  if (updatedCount > 0) {
+    await writeBatch.commit();
+  }
+});
+
+/**
+ * Runs every hour — builds top-N leaderboard snapshots
+ */
+export const buildLeaderboardSnapshots = onSchedule("0 * * * *", async () => {
+  await generateLeaderboardSnapshot();
 });

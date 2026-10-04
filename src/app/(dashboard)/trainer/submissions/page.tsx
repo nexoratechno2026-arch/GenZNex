@@ -1,24 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
 import { db, functions } from "@/lib/firebase/client";
 import { useAuth } from "@/lib/context/AuthContext";
 import type { SubmissionDoc } from "@/types/schema";
-import {
-  FolderGit2,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-  ExternalLink,
-  Loader2,
-  FileCheck,
-  Send,
-  X,
-  FileText,
-  User,
-} from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
+import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 
 export default function TrainerSubmissionsPage() {
   const { user, userProfile, loading: authLoading } = useAuth();
@@ -129,26 +119,30 @@ export default function TrainerSubmissionsPage() {
   if (loading || authLoading) {
     return (
       <div className="p-8 flex flex-col items-center justify-center min-h-[350px]">
-        <Loader2 className="w-8 h-8 text-purple-500 animate-spin mb-3" />
-        <p className="text-gray-400 text-xs font-mono">Loading student submission queue...</p>
+        <div className="w-8 h-8 rounded-full border-2 border-black dark:border-white border-t-transparent animate-spin mb-3" />
+        <p className="text-neutral-600 dark:text-neutral-400 text-xs font-bold">Loading student submission queue...</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-xl border border-neutral-300 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <FolderGit2 className="w-7 h-7 text-cyan-400" /> Student Submissions & Project Grading
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-black text-white dark:bg-white dark:text-black mb-2">
+            <GoogleIcon name="folder_zip" size={14} />
+            <span>Grading Portal</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-black dark:text-white tracking-tight">
+            Student Submissions &amp; Project Grading
           </h1>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-medium">
             Review code repositories, deliver constructive feedback, and award assignment credits.
           </p>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 bg-gray-900 p-1 rounded-xl border border-gray-800 text-xs font-semibold">
+        <div className="flex flex-wrap gap-1.5 p-1 rounded-lg border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-black text-xs font-bold">
           {[
             { id: "all", label: "All" },
             { id: "submitted", label: "Pending Review" },
@@ -158,10 +152,10 @@ export default function TrainerSubmissionsPage() {
             <button
               key={tab.id}
               onClick={() => setFilterStatus(tab.id)}
-              className={`px-3 py-1.5 rounded-lg transition ${
+              className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
                 filterStatus === tab.id
-                  ? "bg-purple-600 text-white font-bold"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  : "text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white"
               }`}
             >
               {tab.label}
@@ -171,15 +165,17 @@ export default function TrainerSubmissionsPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl glass-panel border border-gray-800 space-y-3">
-          <FileCheck className="w-12 h-12 text-gray-600 mx-auto" />
-          <h3 className="text-base font-bold text-white">No Submissions Found</h3>
-          <p className="text-xs text-gray-400">
+        <Card className="p-12 text-center bg-white dark:bg-black border border-neutral-300 dark:border-neutral-800 space-y-3">
+          <div className="w-12 h-12 rounded-full border border-neutral-300 dark:border-neutral-700 flex items-center justify-center mx-auto text-neutral-500 dark:text-neutral-400">
+            <GoogleIcon name="task" size={24} />
+          </div>
+          <h3 className="text-base font-bold text-black dark:text-white">No Submissions Found</h3>
+          <p className="text-xs text-neutral-600 dark:text-neutral-400">
             {filterStatus === "submitted"
               ? "All caught up! There are no pending submissions awaiting review."
               : "No student submissions matching the selected filter."}
           </p>
-        </div>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {filtered.map((sub) => {
@@ -194,34 +190,26 @@ export default function TrainerSubmissionsPage() {
               : "Recent";
 
             return (
-              <div
+              <Card
                 key={sub.id}
-                className="p-5 rounded-2xl glass-panel border border-gray-800 hover:border-gray-700 transition flex flex-col md:flex-row md:items-center justify-between gap-4"
+                className="p-5 bg-white dark:bg-black border border-neutral-300 dark:border-neutral-800 hover:border-black dark:hover:border-white transition flex flex-col md:flex-row md:items-center justify-between gap-4"
               >
                 <div className="space-y-1.5 overflow-hidden">
                   <div className="flex items-center gap-2">
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider ${
-                        sub.status === "graded"
-                          ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-                          : sub.status === "resubmit_requested"
-                          ? "bg-amber-500/10 border border-amber-500/30 text-amber-400"
-                          : "bg-purple-500/10 border border-purple-500/30 text-purple-400"
-                      }`}
-                    >
+                    <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-black text-white dark:bg-white dark:text-black">
                       {sub.status.replace("_", " ")}
                     </span>
-                    <span className="text-xs text-gray-400 font-mono flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {dateStr}
+                    <span className="text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-1 font-medium">
+                      <GoogleIcon name="schedule" size={14} /> {dateStr}
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <User className="w-4 h-4 text-cyan-400" /> {sub.studentName}
+                  <h3 className="text-sm font-bold text-black dark:text-white flex items-center gap-2">
+                    <GoogleIcon name="person" size={16} /> {sub.studentName}
                   </h3>
 
                   {sub.textSubmission && (
-                    <p className="text-xs text-gray-300 truncate max-w-xl">
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 truncate max-w-xl font-medium">
                       {sub.textSubmission}
                     </p>
                   )}
@@ -229,7 +217,7 @@ export default function TrainerSubmissionsPage() {
 
                 <div className="flex items-center gap-3 shrink-0">
                   {sub.grade !== undefined && (
-                    <span className="text-sm font-bold font-mono text-emerald-400 px-3 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                    <span className="text-xs font-bold px-2.5 py-1 rounded bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white">
                       {sub.grade} pts
                     </span>
                   )}
@@ -239,21 +227,22 @@ export default function TrainerSubmissionsPage() {
                       href={sub.fileDownloadUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="p-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition"
+                      className="p-2 rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-900 text-black dark:text-white transition"
                       title="Download attached student files"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <GoogleIcon name="download" size={16} />
                     </a>
                   )}
 
-                  <button
+                  <Button
                     onClick={() => handleOpenGradeModal(sub)}
-                    className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition"
+                    variant={sub.status === "graded" ? "outline" : "primary"}
+                    size="sm"
                   >
                     {sub.status === "graded" ? "Edit Grade" : "Evaluate & Grade"}
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
@@ -261,41 +250,41 @@ export default function TrainerSubmissionsPage() {
 
       {/* Grading Drawer / Modal */}
       {activeSub && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-lg w-full glass-panel p-6 rounded-2xl border border-gray-800 space-y-5">
-            <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <Card className="max-w-lg w-full bg-white dark:bg-black border border-neutral-300 dark:border-neutral-800 p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
               <div>
-                <span className="text-[10px] font-mono text-purple-400 font-bold uppercase tracking-wider block">
+                <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider block">
                   SUBMISSION EVALUATION
                 </span>
-                <h3 className="text-base font-bold text-white">{activeSub.studentName}</h3>
+                <h3 className="text-base font-bold text-black dark:text-white">{activeSub.studentName}</h3>
               </div>
               <button
                 onClick={() => setActiveSub(null)}
-                className="text-gray-400 hover:text-white p-1"
+                className="text-neutral-500 hover:text-black dark:hover:text-white p-1 cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <GoogleIcon name="close" size={20} />
               </button>
             </div>
 
             {/* Submission preview */}
-            <div className="p-4 rounded-xl bg-gray-900/60 border border-gray-800 space-y-2 text-xs">
-              <span className="font-bold text-gray-400 block uppercase tracking-wider text-[10px]">
+            <div className="p-4 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 space-y-2 text-xs">
+              <span className="font-bold text-neutral-500 dark:text-neutral-400 block uppercase tracking-wider text-[10px]">
                 Student Writeup
               </span>
-              <p className="text-gray-200 whitespace-pre-wrap max-h-36 overflow-y-auto">
+              <p className="text-black dark:text-white whitespace-pre-wrap max-h-36 overflow-y-auto font-medium">
                 {activeSub.textSubmission || "No written notes provided."}
               </p>
 
               {activeSub.fileDownloadUrl && (
-                <div className="pt-2 border-t border-gray-800/80">
+                <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
                   <a
                     href={activeSub.fileDownloadUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-cyan-400 hover:underline flex items-center gap-1.5 font-mono"
+                    className="hover:underline flex items-center gap-1.5 font-bold text-black dark:text-white"
                   >
-                    <FileText className="w-3.5 h-3.5" /> View Deliverable File ({activeSub.fileName || "Download"})
+                    <GoogleIcon name="description" size={16} /> View Deliverable File ({activeSub.fileName || "Download"})
                   </a>
                 </div>
               )}
@@ -304,7 +293,7 @@ export default function TrainerSubmissionsPage() {
             {/* Grading Form */}
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                <label className="block text-xs font-bold text-black dark:text-white mb-1">
                   Awarded Score (Points)
                 </label>
                 <input
@@ -313,45 +302,47 @@ export default function TrainerSubmissionsPage() {
                   max={100}
                   value={gradeInput}
                   onChange={(e) => setGradeInput(Number(e.target.value))}
-                  className="w-full px-4 py-2 bg-gray-900 border border-gray-800 rounded-xl text-white font-mono text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md text-black dark:text-white text-sm font-bold focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">
-                  Feedback & Recommendations
+                <label className="block text-xs font-bold text-black dark:text-white mb-1">
+                  Feedback &amp; Recommendations
                 </label>
                 <textarea
                   rows={4}
                   value={feedbackInput}
                   onChange={(e) => setFeedbackInput(e.target.value)}
                   placeholder="Commend good practices, point out edge cases, and share architecture tips..."
-                  className="w-full p-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 text-xs focus:outline-none focus:border-purple-500"
+                  className="w-full p-3 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md text-black dark:text-white placeholder-neutral-500 text-xs focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Modal Actions */}
             <div className="flex gap-2 justify-end pt-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => handleGradeSubmit(true)}
                 disabled={gradingLoading}
-                className="px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition"
               >
                 Request Resubmission
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="primary"
+                size="sm"
                 onClick={() => handleGradeSubmit(false)}
                 disabled={gradingLoading}
-                className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-lg shadow-purple-600/20"
+                leftIcon={gradingLoading ? undefined : <GoogleIcon name="send" size={14} />}
               >
-                {gradingLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                Confirm Grade
-              </button>
+                {gradingLoading ? "Submitting..." : "Confirm Grade"}
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

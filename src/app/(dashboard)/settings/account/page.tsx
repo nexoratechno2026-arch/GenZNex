@@ -203,7 +203,7 @@ export default function AccountSettingsPage() {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
                 Reason for leaving (Optional)
               </label>
               <input
@@ -211,13 +211,13 @@ export default function AccountSettingsPage() {
                 value={deleteReason}
                 onChange={(e) => setDeleteReason(e.target.value)}
                 placeholder="Finished studies, career switch, etc."
-                className="w-full max-w-md px-3 py-2 rounded-xl bg-[#090a0f] border border-gray-700 text-white text-xs outline-none focus:border-rose-500"
+                className="w-full max-w-md px-3 py-2 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white text-xs outline-none focus:border-rose-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1">
-                To confirm, type <span className="font-mono text-rose-400 font-bold">DELETE_MY_ACCOUNT</span> below:
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                To confirm, type <span className="font-mono text-rose-500 font-bold">DELETE_MY_ACCOUNT</span> below:
               </label>
               <div className="flex items-center gap-3">
                 <input
@@ -225,7 +225,7 @@ export default function AccountSettingsPage() {
                   value={deleteConfirmation}
                   onChange={(e) => setDeleteConfirmation(e.target.value)}
                   placeholder="DELETE_MY_ACCOUNT"
-                  className="w-full max-w-xs px-3 py-2 rounded-xl bg-[#090a0f] border border-gray-700 text-white text-xs font-mono outline-none focus:border-rose-500"
+                  className="w-full max-w-xs px-3 py-2 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white text-xs font-mono outline-none focus:border-rose-500"
                 />
                 <button
                   onClick={handleDeleteAccount}

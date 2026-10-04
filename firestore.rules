@@ -132,7 +132,7 @@ service cloud.firestore {
       }
 
       match /reviews/{reviewId} {
-        allow read: if resource.data.isHidden != true || isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
+        allow read: if resource.data.get('isHidden', false) != true || isAdmin() || (isTrainer() && isCourseOwner(get(/databases/$(database)/documents/courses/$(courseId)).data));
         allow write: if false; // Only submitCourseReview Cloud Function writes
       }
     }

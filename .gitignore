@@ -49,6 +49,7 @@ ui-debug.log*
 functions/lib/
 functions/.secret.local
 *.secret.local
+emulator-data/
 
 # vercel
 .vercel

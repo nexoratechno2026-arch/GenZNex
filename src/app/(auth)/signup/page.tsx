@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { PhoneOtpModal } from "@/components/auth/PhoneOtpModal";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { useAuth } from "@/lib/context/AuthContext";
 
 export default function SignupPage() {
@@ -75,12 +76,9 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-black text-black dark:text-white relative">
       <Card className="w-full max-w-md border-neutral-300 dark:border-neutral-800 shadow-lg">
         <CardHeader className="text-center pb-2">
-          <Link href="/" className="inline-flex items-center gap-2 justify-center mx-auto mb-3 group">
-            <div className="w-9 h-9 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold">
-              <GoogleIcon name="bolt" size={20} filled />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-black dark:text-white">GenZNex</span>
-          </Link>
+          <div className="flex justify-center mb-3">
+            <BrandLogo size="lg" href="/" />
+          </div>
           <CardTitle>Create an Account</CardTitle>
           <CardDescription>
             Join India&apos;s Next-Gen Tech Academy &amp; start learning today.

@@ -100,7 +100,7 @@ export interface ModuleDoc {
 export type LessonType = "video" | "pdf" | "text" | "link";
 
 export interface VideoMetadata {
-  provider: "mux" | "bunny" | "vimeo" | "youtube";
+  provider: "mux" | "bunny" | "vimeo" | "youtube" | "googledrive";
   videoId: string;
   durationSeconds?: number;
 }

@@ -6,6 +6,7 @@ import { Zap, Mail, ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { sendPasswordReset } from "@/lib/firebase/auth";
 
 export default function ForgotPasswordPage() {
@@ -34,14 +35,9 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-grid-pattern relative">
       <Card className="w-full max-w-md border-gray-800 shadow-2xl">
         <CardHeader className="text-center pb-2">
-          <Link href="/" className="inline-flex items-center gap-2 justify-center mx-auto mb-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-cyan-400 p-[1.5px]">
-              <div className="w-full h-full bg-[#0d0e17] rounded-[9px] flex items-center justify-center">
-                <Zap className="w-4 h-4 text-cyan-400" />
-              </div>
-            </div>
-            <span className="font-extrabold text-xl tracking-tight text-white">GenZNex</span>
-          </Link>
+          <div className="flex justify-center mb-3">
+            <BrandLogo size="lg" href="/" />
+          </div>
           <CardTitle>Reset Password</CardTitle>
           <CardDescription>
             Enter your registered email address and we&apos;ll send you a password reset link.

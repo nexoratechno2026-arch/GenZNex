@@ -23,10 +23,10 @@ export function Sidebar({ role }: SidebarProps) {
     { label: "Leaderboard", href: "/leaderboard", icon: "leaderboard" },
     { label: "Doubts Forum", href: "/forum", icon: "forum" },
     { label: "Notifications", href: "/notifications", icon: "notifications" },
-    { label: "My Training", href: "/student/training", icon: "rocket_launch" },
+    { label: "Live Sprints", href: "/student/training", icon: "terminal" },
     { label: "Live Schedule", href: "/student/schedule", icon: "calendar_today" },
-    { label: "Mock Interviews", href: "/student/interviews", icon: "mic" },
-    { label: "Placement Desk", href: "/jobs", icon: "work" },
+    { label: "Interview Prep", href: "/student/interviews", icon: "record_voice_over" },
+    { label: "Tech Opportunities", href: "/jobs", icon: "work" },
   ];
 
   const trainerNavItems = [
@@ -46,8 +46,8 @@ export function Sidebar({ role }: SidebarProps) {
     { label: "Revenue & Ledger", href: "/admin/revenue", icon: "payments" },
     { label: "Discount Coupons", href: "/admin/coupons", icon: "sell" },
     { label: "Platform Analytics", href: "/admin/analytics", icon: "analytics" },
-    { label: "Training Programs", href: "/programs", icon: "rocket_launch" },
-    { label: "Placement Pipeline", href: "/jobs", icon: "work" },
+    { label: "Curriculum Cohorts", href: "/programs", icon: "layers" },
+    { label: "Job Opportunities", href: "/jobs", icon: "work" },
   ];
 
   const navItems =
@@ -58,20 +58,20 @@ export function Sidebar({ role }: SidebarProps) {
       : studentNavItems;
 
   return (
-    <aside className="w-full md:w-64 border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-4 flex flex-col justify-between shrink-0">
+    <aside className="w-full md:w-64 border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-4 flex flex-col justify-between shrink-0 md:sticky md:top-16 md:h-[calc(100vh-4rem)] md:overflow-y-auto">
       <div className="space-y-6">
         
         {/* User Card */}
-        <div className="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold text-sm shrink-0">
+        <div className="p-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
             {(userProfile?.displayName || user?.email || "U")[0]?.toUpperCase()}
           </div>
           <div className="overflow-hidden">
-            <div className="text-xs font-bold text-black dark:text-white truncate">
+            <div className="text-xs font-bold text-neutral-900 dark:text-white truncate">
               {userProfile?.displayName || user?.displayName || user?.email?.split("@")[0] || "Learner"}
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[10px] font-bold px-2 py-0.2 rounded uppercase tracking-wider bg-black text-white dark:bg-white dark:text-black">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
                 {role}
               </span>
             </div>
@@ -92,10 +92,10 @@ export function Sidebar({ role }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center justify-between px-3 py-2 rounded-md text-xs font-bold transition-all ${
+                className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all ${
                   isActive
-                    ? "bg-black text-white dark:bg-white dark:text-black shadow-sm"
-                    : "text-neutral-700 hover:text-black hover:bg-neutral-100 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-900"
+                    ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 shadow-sm"
+                    : "text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-neutral-900"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -110,17 +110,17 @@ export function Sidebar({ role }: SidebarProps) {
       </div>
 
       {/* Bottom Footer Actions */}
-      <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800 space-y-1">
+      <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800 space-y-1 mt-6">
         <Link
           href="/"
-          className="flex items-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
         >
           <GoogleIcon name="home" size={16} />
           <span>Home Page</span>
         </Link>
         <button
           onClick={() => logout()}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors cursor-pointer"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors cursor-pointer text-left"
         >
           <GoogleIcon name="logout" size={16} />
           <span>Sign Out</span>

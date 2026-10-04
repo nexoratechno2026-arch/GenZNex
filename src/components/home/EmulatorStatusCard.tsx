@@ -70,19 +70,19 @@ export function EmulatorStatusCard() {
   ];
 
   return (
-    <section id="emulator-status" className="py-20 border-t border-neutral-800 dark:border-neutral-800 light:border-neutral-200">
+    <section id="emulator-status" className="py-20 border-t border-neutral-200 dark:border-neutral-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="mb-12">
-          <div className="text-xs uppercase font-bold tracking-widest text-neutral-400 dark:text-neutral-400 light:text-neutral-600 mb-2 flex items-center gap-1.5">
+          <div className="text-xs uppercase font-bold tracking-widest text-neutral-500 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
             <GoogleIcon name="shield" size={16} />
             <span>Architecture &amp; Rules Verification</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white dark:text-white light:text-black">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-black dark:text-white">
             Firebase Security &amp; Local Verification Engine
           </h2>
-          <p className="mt-2 text-sm text-neutral-300 dark:text-neutral-300 light:text-neutral-700 max-w-3xl">
+          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 max-w-3xl">
             Live local development is powered 100% by the Firebase Emulator Suite. Direct client writes to critical collections are blocked by strict security rules.
           </p>
         </div>
@@ -92,24 +92,24 @@ export function EmulatorStatusCard() {
           {emulators.map((emu) => (
             <div
               key={emu.name}
-              className="p-4 rounded-lg border border-neutral-800 dark:border-neutral-800 light:border-neutral-200 bg-black dark:bg-black light:bg-white"
+              className="p-4 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 dark:text-neutral-400 light:text-neutral-600">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-500 dark:text-neutral-400">
                   Port :{emu.port}
                 </span>
-                <span className="w-2 h-2 rounded-full bg-white dark:bg-white light:bg-black" />
+                <span className="w-2 h-2 rounded-full bg-black dark:bg-white" />
               </div>
-              <div className="font-bold text-sm text-white dark:text-white light:text-black mb-1">
+              <div className="font-bold text-sm text-black dark:text-white mb-1">
                 {emu.name}
               </div>
-              <div className="flex items-center justify-between text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700">
-                <span className="font-medium text-white dark:text-white light:text-black">{emu.status}</span>
+              <div className="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400">
+                <span className="font-medium text-black dark:text-white">{emu.status}</span>
                 <a
                   href={emu.path}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-neutral-400 hover:text-white dark:hover:text-white light:hover:text-black"
+                  className="text-neutral-500 hover:text-black dark:hover:text-white"
                 >
                   <GoogleIcon name="open_in_new" size={14} />
                 </a>
@@ -119,24 +119,24 @@ export function EmulatorStatusCard() {
         </div>
 
         {/* Security Rules Matrix */}
-        <div className="rounded-lg border border-neutral-800 dark:border-neutral-800 light:border-neutral-200 overflow-hidden bg-black dark:bg-black light:bg-white">
-          <div className="px-6 py-4 border-b border-neutral-800 dark:border-neutral-800 light:border-neutral-200 flex items-center justify-between">
+        <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 overflow-hidden bg-white dark:bg-black">
+          <div className="px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <GoogleIcon name="verified_user" size={18} />
-              <span className="font-bold text-sm text-white dark:text-white light:text-black">
+              <span className="font-bold text-sm text-black dark:text-white">
                 Security Rules &amp; Zero-Trust Protocol
               </span>
             </div>
-            <span className="text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700">
+            <span className="text-xs text-neutral-600 dark:text-neutral-400">
               48/48 Rules Tests Passing
             </span>
           </div>
 
-          <div className="divide-y divide-neutral-800 dark:divide-neutral-800 light:divide-neutral-200">
+          <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
             {rulesMatrix.map((item, idx) => (
               <div key={idx} className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="space-y-0.5">
-                  <div className="font-bold text-white dark:text-white light:text-black text-sm flex items-center gap-1.5">
+                  <div className="font-bold text-black dark:text-white text-sm flex items-center gap-1.5">
                     <GoogleIcon name="check_circle" size={15} />
                     <span>{item.rule}</span>
                   </div>

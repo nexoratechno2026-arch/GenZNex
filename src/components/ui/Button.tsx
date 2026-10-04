@@ -41,15 +41,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-black text-white border border-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-neutral-200",
+        "btn-primary bg-black text-white border border-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-neutral-200",
       secondary:
-        "bg-white text-black border border-neutral-300 hover:bg-neutral-100 dark:bg-black dark:text-white dark:border-neutral-700 dark:hover:bg-neutral-900",
+        "btn-secondary bg-white text-black border border-neutral-300 hover:bg-neutral-100 dark:bg-black dark:text-white dark:border-neutral-700 dark:hover:bg-neutral-900",
       outline:
-        "bg-transparent text-black border border-black hover:bg-neutral-100 dark:text-white dark:border-white dark:hover:bg-neutral-900",
+        "btn-outline bg-transparent text-black border border-black hover:bg-neutral-100 dark:text-white dark:border-white dark:hover:bg-neutral-900",
       ghost:
-        "bg-transparent text-black hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-900",
+        "btn-ghost bg-transparent text-black hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-900",
       danger:
-        "bg-black text-white border border-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-neutral-200",
+        "btn-primary bg-black text-white border border-black hover:bg-neutral-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-neutral-200",
     };
 
     return (

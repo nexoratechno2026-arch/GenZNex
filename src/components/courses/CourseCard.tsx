@@ -32,37 +32,37 @@ export function CourseCard({ course }: CourseCardProps) {
   return (
     <Link
       href={`/courses/${course.slug}`}
-      className="group relative flex flex-col rounded-lg border border-neutral-800 dark:border-neutral-800 light:border-neutral-200 bg-black dark:bg-black light:bg-white transition-all duration-200 hover:border-white dark:hover:border-white light:hover:border-black overflow-hidden"
+      className="group relative flex flex-col rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 transition-all duration-300 hover:border-violet-500/50 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
     >
       {/* Thumbnail Container */}
-      <div className="relative aspect-video w-full overflow-hidden bg-neutral-900 dark:bg-neutral-900 light:bg-neutral-100">
+      <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
         <img
           src={course.thumbnailUrl || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=450&fit=crop"}
           alt={course.title}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
 
-        {/* Level & Language Badges in Monochrome */}
+        {/* Level & Language Badges */}
         <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
-          <span className="rounded bg-black/80 dark:bg-black/80 light:bg-white/90 text-white dark:text-white light:text-black px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider border border-neutral-700 dark:border-neutral-700 light:border-neutral-300">
+          <span className="rounded-md bg-black/60 backdrop-blur-md text-white px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider border border-white/15 shadow-sm">
             {course.level}
           </span>
-          <span className="rounded bg-black/80 dark:bg-black/80 light:bg-white/90 text-white dark:text-white light:text-black px-2 py-0.5 text-[11px] font-bold border border-neutral-700 dark:border-neutral-700 light:border-neutral-300">
+          <span className="rounded-md bg-black/60 backdrop-blur-md text-white px-2.5 py-0.5 text-[11px] font-bold border border-white/15 shadow-sm">
             {course.language}
           </span>
         </div>
 
         {/* Discount Badge */}
         {discountPercent && (
-          <div className="absolute top-3 right-3 rounded bg-white text-black dark:bg-white dark:text-black light:bg-black light:text-white px-2 py-0.5 text-xs font-bold border border-neutral-400">
+          <div className="absolute top-3 right-3 rounded-md bg-gradient-to-r from-rose-500 to-amber-500 text-white px-2.5 py-0.5 text-xs font-extrabold shadow-sm">
             {discountPercent}% OFF
           </div>
         )}
 
         {/* Featured Ribbon */}
         {course.isFeatured && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-1 rounded bg-black/90 text-white dark:bg-black/90 dark:text-white light:bg-white/95 light:text-black px-2 py-0.5 text-xs font-bold border border-neutral-700 dark:border-neutral-700 light:border-neutral-300">
+          <div className="absolute bottom-3 left-3 flex items-center gap-1 rounded-md bg-violet-600 text-white px-2.5 py-0.5 text-xs font-bold shadow-md shadow-violet-600/30">
             <GoogleIcon name="stars" size={14} />
             <span>Featured</span>
           </div>
@@ -72,34 +72,34 @@ export function CourseCard({ course }: CourseCardProps) {
       {/* Course Info */}
       <div className="flex flex-1 flex-col p-5">
         {/* Category */}
-        <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-400 light:text-neutral-600">
+        <p className="text-xs font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">
           {course.categoryName || course.category}
         </p>
 
         {/* Title */}
-        <h3 className="mt-1.5 text-base font-bold text-white dark:text-white light:text-black line-clamp-2">
+        <h3 className="mt-1.5 text-base font-bold text-neutral-900 dark:text-white line-clamp-2 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
           {course.title}
         </h3>
 
         {/* Subtitle */}
-        <p className="mt-1 text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700 line-clamp-2 flex-1">
+        <p className="mt-1.5 text-xs text-neutral-600 dark:text-neutral-400 line-clamp-2 flex-1 leading-relaxed">
           {course.subtitle || course.description}
         </p>
 
         {/* Meta details */}
-        <div className="mt-4 flex items-center gap-4 text-xs text-neutral-300 dark:text-neutral-300 light:text-neutral-700 pt-3 border-t border-neutral-800 dark:border-neutral-800 light:border-neutral-200">
-          <div className="flex items-center gap-1">
+        <div className="mt-4 flex items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400 pt-3 border-t border-neutral-100 dark:border-neutral-800">
+          <div className="flex items-center gap-1.5">
             <GoogleIcon name="schedule" size={15} />
             <span>{Math.round((course.totalDurationMinutes || 0) / 60)} hrs</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <GoogleIcon name="menu_book" size={15} />
             <span>{course.lessonCount || 0} lessons</span>
           </div>
           {course.ratingCount > 0 && (
-            <div className="flex items-center gap-1 ml-auto font-bold text-white dark:text-white light:text-black">
+            <div className="flex items-center gap-1 ml-auto font-bold text-amber-500">
               <GoogleIcon name="star" size={15} filled />
-              <span>{course.rating.toFixed(1)}</span>
+              <span className="text-neutral-900 dark:text-white">{course.rating.toFixed(1)}</span>
             </div>
           )}
         </div>
@@ -107,17 +107,17 @@ export function CourseCard({ course }: CourseCardProps) {
         {/* Price & Checkout Link */}
         <div className="mt-4 flex items-center justify-between pt-2">
           <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-white dark:text-white light:text-black">
+            <span className="text-lg font-extrabold text-neutral-900 dark:text-white">
               {formatPrice(currentPrice)}
             </span>
             {originalPrice && (
-              <span className="text-xs text-neutral-500 line-through">
+              <span className="text-xs text-neutral-400 line-through">
                 {formatPrice(originalPrice)}
               </span>
             )}
           </div>
-          <span className="text-xs font-bold text-white dark:text-white light:text-black flex items-center gap-1 underline underline-offset-2">
-            <span>Details</span>
+          <span className="text-xs font-bold text-violet-600 dark:text-violet-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+            <span>Explore</span>
             <GoogleIcon name="arrow_forward" size={14} />
           </span>
         </div>

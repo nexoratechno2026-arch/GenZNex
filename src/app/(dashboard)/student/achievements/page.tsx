@@ -60,6 +60,7 @@ export default function StudentAchievementsPage() {
         } else {
           setBadges([
             { id: "badge_first_lesson", name: "First Step", description: "Completed your very first lesson on GenZNex", icon: "Sparkles", category: "learning", criteriaType: "count", threshold: 1, order: 1 },
+            { id: "badge_module_master", name: "Module Master", description: "Successfully finished all curriculum lessons in a module", icon: "Award", category: "learning", criteriaType: "count", threshold: 1, order: 1.5 },
             { id: "badge_streak_7", name: "On Fire (7-Day)", description: "Maintained a 7-day continuous learning streak", icon: "Flame", category: "streak", criteriaType: "streak", threshold: 7, order: 2 },
             { id: "badge_streak_30", name: "Unstoppable (30-Day)", description: "Crushed a 30-day learning streak in Asia/Kolkata timezone", icon: "Zap", category: "streak", criteriaType: "streak", threshold: 30, order: 3 },
             { id: "badge_perfect_score", name: "Perfectionist", description: "Scored 100% on a technical assessment checkpoint", icon: "Award", category: "learning", criteriaType: "score", threshold: 100, order: 4 },
