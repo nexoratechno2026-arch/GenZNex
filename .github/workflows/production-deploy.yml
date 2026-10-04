@@ -2,9 +2,8 @@ name: Production Release Pipeline (Manual Gate)
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+  release:
+    types: [published]
 
 permissions:
   contents: read
