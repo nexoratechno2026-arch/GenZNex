@@ -1,6 +1,7 @@
 name: Staging Continuous Deployment
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
 
@@ -8,7 +9,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging (genznex-staging)
     runs-on: ubuntu-latest
-    environment: staging
+    if: ${{ secrets.FIREBASE_CI_TOKEN != '' }}
     timeout-minutes: 25
 
     steps:
