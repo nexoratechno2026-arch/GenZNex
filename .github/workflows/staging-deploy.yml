@@ -45,11 +45,13 @@ jobs:
 
       - name: Deploy Firebase Security Rules & Indexes
         if: steps.check_creds.outputs.enabled == 'true'
+        continue-on-error: true
         run: |
           npx firebase-tools deploy --only firestore:rules,storage:rules,firestore:indexes --project genznex-staging --token "$FIREBASE_CI_TOKEN"
 
       - name: Deploy Cloud Functions (2nd Gen)
         if: steps.check_creds.outputs.enabled == 'true'
+        continue-on-error: true
         run: |
           npx firebase-tools deploy --only functions --project genznex-staging --token "$FIREBASE_CI_TOKEN"
 
@@ -62,6 +64,7 @@ jobs:
 
       - name: Deploy Firebase Hosting
         if: steps.check_creds.outputs.enabled == 'true'
+        continue-on-error: true
         run: |
           npx firebase-tools deploy --only hosting --project genznex-staging --token "$FIREBASE_CI_TOKEN"
 

@@ -37,7 +37,7 @@ jobs:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
 
-      - name: Run Key Integrity Guard (CRITICAL: Reject Test Keys on Production)
+      - name: "Run Key Integrity Guard (CRITICAL: Reject Test Keys on Production)"
         run: npx tsx scripts/verify-env-keys.ts prod
         env:
           NEXT_PUBLIC_RAZORPAY_KEY_ID: ${{ secrets.PROD_RAZORPAY_KEY_ID }}
